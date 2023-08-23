@@ -4,7 +4,8 @@
 ## About
 
 Aika provides date- and time-range parsing utilities for multiple languages.
-It is based on [arbitrary-dateparser] and [DateRangeParser].
+It is based on [arbitrary-dateparser] and [DateRangeParser], and aims for
+[DWIM]-like convenience and usefulness.
 
 Currently, it supports English and German, and welcomes contributions for
 other languages.
@@ -116,5 +117,6 @@ Aika means "time" in the Finnish language.
 
 [arbitrary-dateparser]: https://pypi.org/project/arbitrary-dateparser/
 [DateRangeParser]: https://pypi.org/project/DateRangeParser/
+[DWIM]: https://en.wikipedia.org/wiki/DWIM
 [Michael Phelps]: https://github.com/nottheswimmer
 [Robin Wilson]: https://github.com/robintw
