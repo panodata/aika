@@ -91,10 +91,19 @@ source .venv/bin/activate
 poe check
 ```
 
+
 ## Etymology
 
 Aika means "time" in the Finnish language.
 
 
+## Acknowledgements
+
+- [Michael Phelps] for conceiving [arbitrary-dateparser].
+- [Robin Wilson] and contributors for conceiving and maintaining [DateRangeParser].
+
+
 [arbitrary-dateparser]: https://pypi.org/project/arbitrary-dateparser/
 [DateRangeParser]: https://pypi.org/project/DateRangeParser/
+[Michael Phelps]: https://github.com/nottheswimmer
+[Robin Wilson]: https://github.com/robintw
