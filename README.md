@@ -108,6 +108,23 @@ dr.parse("Sat - Tue")
 (datetime(2023, 8, 26, 9, 0), datetime(2023, 8, 29, 17, 0))
 ```
 
+
+## Troubleshooting
+
+If you see an error message like `locale.Error: unsupported locale setting` for
+code like this,
+```python
+locale.setlocale(locale.LC_ALL, "de_DE.UTF-8")
+```
+
+you will need to generate the German locales.
+```shell
+apt-get update
+apt-get install --yes tzdata locales
+locale-gen de_DE.UTF-8
+```
+
+
 ## Setup
 
 Acquire source code and install development sandbox.
