@@ -5,7 +5,6 @@ https://pypi.org/project/arbitrary-dateparser/
 """
 
 import calendar
-import locale
 import re
 from itertools import product
 from typing import Tuple
@@ -13,14 +12,15 @@ from typing import Tuple
 import pendulum
 from arbitrary_dateparser import DateParser
 
-locale.setlocale(locale.LC_ALL, "de_DE.UTF-8")
+from aika.util import LocaleManager
 
-MONTH_NAMES = [calendar.month_name[x].lower() for x in range(1, 13)]
-MONTH_NAMES_ABBREVIATED = [calendar.month_abbr[x].lower() for x in range(1, 13)]
+with LocaleManager("de_DE.UTF-8"):
+    MONTH_NAMES = [calendar.month_name[x].lower() for x in range(1, 13)]
+    MONTH_NAMES_ABBREVIATED = [calendar.month_abbr[x].lower() for x in range(1, 13)]
 
-# Start with Sunday for Indexing.
-DAY_NAMES = [calendar.day_name[x].lower() for x in (6, *range(0, 6))]
-DAY_NAMES_ABBREVIATED = [calendar.day_abbr[x].lower() for x in (6, *range(0, 6))]
+    # Start with Sunday for Indexing.
+    DAY_NAMES = [calendar.day_name[x].lower() for x in (6, *range(0, 6))]
+    DAY_NAMES_ABBREVIATED = [calendar.day_abbr[x].lower() for x in (6, *range(0, 6))]
 
 # German language has masculine, feminine, and neuter forms for entities of calendar nouns.
 # https://deutsch.lingolia.com/en/grammar/nouns-and-articles/gender
