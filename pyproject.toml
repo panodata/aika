@@ -50,7 +50,6 @@ classifiers = [
 dependencies = [
   "arbitrary-dateparser==0.0.4",
   "DateRangeParser<1.4",
-  "freezegun<1.3",
 ]
 
 [project.optional-dependencies]
@@ -69,6 +68,7 @@ release = [
 ]
 test = [
   "coverage<8",
+  "freezegun<1.3",
   "pytest<8",
 ]
 [tool.setuptools]
