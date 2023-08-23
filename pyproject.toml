@@ -51,7 +51,6 @@ dependencies = [
   "arbitrary-dateparser==0.0.4",
   "DateRangeParser<1.4",
   "freezegun<1.3",
-  "python-dateutil<3",
 ]
 
 [project.optional-dependencies]
