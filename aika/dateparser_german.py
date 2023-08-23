@@ -13,7 +13,7 @@ from typing import Tuple
 import pendulum
 from arbitrary_dateparser import DateParser
 
-locale.setlocale(locale.LC_ALL, "de_DE")
+locale.setlocale(locale.LC_ALL, "de_DE.UTF-8")
 
 MONTH_NAMES = [calendar.month_name[x].lower() for x in range(1, 13)]
 MONTH_NAMES_ABBREVIATED = [calendar.month_abbr[x].lower() for x in range(1, 13)]
