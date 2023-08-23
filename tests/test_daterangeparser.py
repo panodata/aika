@@ -37,33 +37,8 @@ def test_single_basics():
 
 
 @freeze_time(TESTDRIVE_DATETIME)
-def test_single_relative():
-    dr = DaterangeExpression()
-    assert dr.parse("today") == (
-        dt.datetime(2023, 8, 17, 0, 0, 0),
-        dt.datetime(2023, 8, 17, 23, 59, 59, 999999),
     )
-    assert dr.parse("now") == (
-        dt.datetime(2023, 8, 17, 23, 3, 17),
-        dt.datetime(2023, 8, 17, 23, 59, 59, 999999),
     )
-
-
-@freeze_time(TESTDRIVE_DATETIME)
-def test_default_start_time():
-    dr = DaterangeExpression(default_start_time=dt.time(hour=9))
-    assert dr.parse("jul 1 to jul 7") == (
-        dt.datetime(2023, 7, 1, 9, 0),
-        dt.datetime(2023, 7, 7, 23, 59, 59, 999999),
-    )
-    assert dr.parse("today") == (
-        dt.datetime(2023, 8, 17, 9, 0, 0),
-        dt.datetime(2023, 8, 17, 23, 59, 59, 999999),
-    )
-    # A specific datetime must not be changed through `default_start_time`.
-    assert dr.parse("now") == (
-        dt.datetime(2023, 8, 17, 23, 3, 17),
-        dt.datetime(2023, 8, 17, 23, 59, 59, 999999),
     )
 
 

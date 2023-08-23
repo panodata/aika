@@ -27,17 +27,17 @@ a few examples.
 
 #### arbitrary-dateparser
 
-- jul 1 to jul 7
+- now
+- today
 - last week to next friday
 - tomorrow - next week
 - next month
 - december
+- jul 1 to jul 7
 - Sat - Tue
 
 #### DateRangeParser
 
-- today
-- now
 - 1st july
 - March 2024
 - July to December
