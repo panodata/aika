@@ -11,6 +11,14 @@ Currently, it supports English and German, and welcomes contributions for
 other languages.
 
 
+## Setup
+
+Install the most recent version of Aika.
+```shell
+pip install --upgrade aika
+```
+
+
 ## Usage
 
 ```python
@@ -125,7 +133,7 @@ locale-gen de_DE.UTF-8
 ```
 
 
-## Setup
+## Development
 
 Acquire source code and install development sandbox.
 ```shell
