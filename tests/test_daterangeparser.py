@@ -1,5 +1,5 @@
 # Copyright (c) 2023, The Panodata developers and contributors.
-# Distributed under the terms of the MIT license, see LICENSE.
+# Distributed under the terms of the LGPL license, see LICENSE.
 
 import datetime as dt
 
