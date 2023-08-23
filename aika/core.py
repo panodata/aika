@@ -7,14 +7,18 @@ import typing as t
 
 from arbitrary_dateparser import DateParser
 from daterangeparser import parse as drp_parse_english
+from pendulum import Period
 
+from .dateparser_german import DateParserGerman
 from .daterangeparser_german import parse_german as drp_parse_german
 from .model import Parser, trange
 
 logger = logging.getLogger(__name__)
 
 # FIXME: Do not set timezone explicitly.
-arbitrary_parser = DateParser(tz="Europe/Berlin")
+arbitrary_parser_english = DateParser(tz="Europe/Berlin")
+arbitrary_parser_english.replaced_words["in"] = "this"
+arbitrary_parser_german = DateParserGerman(tz="Europe/Berlin")
 
 before_midnight = dt.time(hour=23, minute=59, second=59, microsecond=999999)
 midnights = [dt.time(hour=0, minute=0, second=0), before_midnight]
@@ -40,6 +44,7 @@ class DaterangeExpression:
         self.parsers += [
             Parser(name="DateRangeParser [en]", fun=drp_parse_english),
             Parser(name="DateRangeParser [de]", fun=drp_parse_german),
+            Parser(name="arbitrary-dateparser [de]", fun=adp_parse_german),
             Parser(name="arbitrary-dateparser [en]", fun=adp_parse_english),
         ]
 
@@ -90,13 +95,26 @@ class DaterangeExpression:
 
 def adp_parse_english(when: str) -> trange:
     """
-    Parse date range using `arbitrary-dateparser`.
+    Parse date range using `arbitrary-dateparser`. English variant.
+    """
+    return from_pendulum(arbitrary_parser_english(when))
+
+
+def adp_parse_german(when: str) -> trange:
+    """
+    Parse date range using `arbitrary-dateparser`. German variant.
+    """
+    return from_pendulum(arbitrary_parser_german(when))
+
+
+def from_pendulum(period: Period) -> trange:
+    """
+    Translate Pendulum `Period` to tuple of `datetime` objects.
     """
 
     def pendulum_to_datetime(value):
         return dt.datetime.fromisoformat(value.to_iso8601_string())
 
-    period = arbitrary_parser(when)
     date_start = period.start.naive()
-    date_end = period.end.end_of("day").naive()
+    date_end = period.end.naive()
     return pendulum_to_datetime(date_start), pendulum_to_datetime(date_end)
