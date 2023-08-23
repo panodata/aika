@@ -32,7 +32,7 @@ Aika understands all types of date-/time-range expressions like provided by the
 packages it is based upon, and works with single dates too. This section enumerates
 a few examples.
 
-#### arbitrary-dateparser
+#### arbitrary-dateparser » English
 
 - now
 - today
@@ -40,8 +40,27 @@ a few examples.
 - tomorrow - next week
 - next month
 - december
+- July to December
 - jul 1 to jul 7
 - Sat - Tue
+- in March
+- 2024-08-20
+
+#### arbitrary-dateparser » German
+
+- jetzt
+- heute
+- letzte woche bis nächsten freitag
+- morgen - nächste woche
+- nächster monat
+- dezember
+- Juli-Dezember
+- jul 1 to jul 7
+- von Samstag bis Dienstag
+- im März
+- 20\. August 2024
+- 20.8.2024
+- 20.08.2024
 
 #### DateRangeParser » English
 
