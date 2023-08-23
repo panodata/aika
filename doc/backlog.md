@@ -15,3 +15,6 @@
 - Get locale right, for both timezone handling and humanized output
   - aika/core: FIXME: Do not set timezone explicitly.
   - `arrow.humanize()`
+- Synchronize splitters/separators from both libraries
+- Do not require locales for other languages to be installed.
+  If not, handle it gracefully.
