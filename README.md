@@ -6,6 +6,9 @@
 Aika provides date- and time-range parsing utilities for multiple languages.
 It is based on [arbitrary-dateparser] and [DateRangeParser].
 
+Currently, it supports English and German, and welcomes contributions for
+other languages.
+
 
 ## Usage
 
@@ -36,7 +39,7 @@ a few examples.
 - jul 1 to jul 7
 - Sat - Tue
 
-#### DateRangeParser
+#### DateRangeParser » English
 
 - 1st july
 - March 2024
@@ -52,6 +55,14 @@ a few examples.
 - Jan 2011 - Mar 2014 
 - 07:00 Tue 7th June - 17th July 3:30pm
   <br>**Caveat**: Times will currently be ignored.
+
+#### DateRangeParser » German
+
+- 1\. Juli
+- 1\. bis 7. Juli
+- März 2024
+- Juli bis Dezember
+- Vom 3. März bis zum 9. März 2024
 
 
 ## Advanced Usage
