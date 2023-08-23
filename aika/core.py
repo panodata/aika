@@ -51,7 +51,7 @@ class DaterangeExpression:
 
     def parse(self, when: str) -> trange:
         """
-        Parse date range from text.
+        Parse date range from textual expression.
         """
         if not when:
             when = "now"
@@ -69,13 +69,10 @@ class DaterangeExpression:
         if date_start is None:
             raise ValueError(f"Failed parsing date range: {when}")
 
-        if date_end is None:
-            date_end = date_start
-
         if date_start.time() in midnights and self.default_start_time is not None:
             date_start = dt.datetime.combine(date_start, self.default_start_time)
 
-        if date_end.time() in midnights:
+        if date_end is not None and date_end.time() in midnights:
             if self.default_end_time is not None:
                 time = self.default_end_time
             else:
@@ -83,6 +80,12 @@ class DaterangeExpression:
             date_end = dt.datetime.combine(date_end, time)
 
         return date_start, date_end
+
+    def parse_single(self, when: str) -> dt.datetime:
+        """
+        Parse single date from textual expression.
+        """
+        return self.parse(when)[0]
 
 
 def adp_parse_english(when: str) -> trange:

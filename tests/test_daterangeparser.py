@@ -32,7 +32,7 @@ def test_range_basics():
 
 
 @freeze_time(TESTDRIVE_DATETIME)
-def test_single_basics():
+def test_single_parse_basics():
     dr = DaterangeExpression()
     assert (
         dr.parse("1st july")
@@ -40,7 +40,7 @@ def test_single_basics():
         == dr.parse("1. juli")
         == (
             dt.datetime(2023, 7, 1, 0, 0),
-            dt.datetime(2023, 7, 1, 23, 59, 59, 999999),
+            None,
         )
     )
     assert (
@@ -51,6 +51,15 @@ def test_single_basics():
             dt.datetime(2024, 3, 31, 23, 59, 59, 999999),
         )
     )
+
+
+@freeze_time(TESTDRIVE_DATETIME)
+def test_single_parse_single_basics():
+    """
+    Verify the `parse_single` method.
+    """
+    dr = DaterangeExpression()
+    assert dr.parse_single("1. juli") == dr.parse_single("1. juli") == dt.datetime(2023, 7, 1, 0, 0)
 
 
 @freeze_time(TESTDRIVE_DATETIME)

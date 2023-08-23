@@ -17,11 +17,14 @@ other languages.
 from aika import DaterangeExpression
 
 dr = DaterangeExpression()
-dr.parse("Sat - Tue")
+print("Range: ", dr.parse("Sat - Tue"))
+print("Single:", dr.parse_single("1. Juli"))
 ```
 ```python
-(datetime(2023, 8, 26, 0, 0), datetime(2023, 8, 29, 23, 59, 59, 999999))
+Range:  (datetime(2023, 8, 26, 0, 0), datetime(2023, 8, 29, 23, 59, 59, 999999))
+Single: datetime(2023, 7, 1, 0, 0)
 ```
+
 
 ### Example Expressions
 
