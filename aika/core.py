@@ -12,7 +12,8 @@ from .model import Parser, trange
 
 logger = logging.getLogger(__name__)
 
-arbitrary_parser = DateParser()
+# FIXME: Do not set timezone explicitly.
+arbitrary_parser = DateParser(tz="Europe/Berlin")
 
 before_midnight = dt.time(hour=23, minute=59, second=59, microsecond=999999)
 midnights = [dt.time(hour=0, minute=0, second=0), before_midnight]
