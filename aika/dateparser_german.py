@@ -1,12 +1,16 @@
 """
-Contains the DateParser module and relevant constants.
+The German variant of the DateParser module from the arbitrary-dateparser package by Michael Phelps.
+
+https://pypi.org/project/arbitrary-dateparser/
 """
 
 import calendar
 import re
 from itertools import product
+from typing import Tuple
 
 import pendulum
+from arbitrary_dateparser import DateParser
 
 MONTH_NAMES = [calendar.month_name[x].lower() for x in range(1, 13)]
 MONTH_NAMES_ABBREVIATED = [calendar.month_abbr[x].lower() for x in range(1, 13)]
@@ -16,7 +20,7 @@ DAY_NAMES = [calendar.day_name[x].lower() for x in (6, *range(0, 6))]
 DAY_NAMES_ABBREVIATED = [calendar.day_abbr[x].lower() for x in (6, *range(0, 6))]
 
 
-class DateParser:
+class DateParserGerman(DateParser):
     def __init__(
         self,
         tz="local",
@@ -63,6 +67,7 @@ class DateParser:
             self.replaced_words[month] = MONTH_NAMES_ABBREVIATED[i]
 
         # These variables modify dates
+        self.unfiltered_words: Tuple[str]
         self.post_word_replace_date_transformations = [
             lambda s: " ".join(x for x in s.split(" ") if x in self.unfiltered_words or not x.isalpha()),
         ]
@@ -90,22 +95,22 @@ class DateParser:
                 "{m} {d}",
                 "{d} [Of] {m}",
                 # # Monthless
-                # 'DDDD [Day Of] YYYY',
-                # # Dayless
-                # '{m} YYYY',
+                # 'DDDD [Day Of] YYYY', # noqa: ERA001
+                # # Dayless             # noqa: ERA001
+                # '{m} YYYY',           # noqa: ERA001
                 # Full
                 "{m} {d} {y}",
                 "{d} [Of] {m} {y}",
-            }
+            }  # noqa: ERA001
             format_templates.update(
-                # {'%s {t}' % x for x in format_templates}
-                # | {'%s [At] {t}' % x for x in format_templates}
+                # {'%s {t}' % x for x in format_templates}          # noqa: ERA001
+                # | {'%s [At] {t}' % x for x in format_templates}   # noqa: ERA001
             )
 
-        self.date_formats = {
+        self.date_formats = [
             f.format(d=d, m=m, y=y, t=t)
             for d, m, y, t, f in product(_day_formats, _month_formats, _year_formats, _time_formats, format_templates)
-        }
+        ]
 
         # Unfortunately this appears to be necessary for consistent behavior
         def _format_sorter(fmt):
@@ -114,7 +119,7 @@ class DateParser:
             priority += ("MMM" in fmt) * 100
             priority += ("MMM" not in fmt and "MM" in fmt) * 10
             priority += ("DD" in fmt) * 1
-            priority += 1 / len(fmt)
+            priority += 1 // len(fmt)
             return priority
 
         self.date_formats = sorted(self.date_formats, key=_format_sorter, reverse=True)
