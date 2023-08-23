@@ -8,6 +8,7 @@ import typing as t
 from arbitrary_dateparser import DateParser
 from daterangeparser import parse as drp_parse_english
 
+from .daterangeparser_german import parse_german as drp_parse_german
 from .model import Parser, trange
 
 logger = logging.getLogger(__name__)
@@ -38,6 +39,7 @@ class DaterangeExpression:
     def use_all_parsers(self):
         self.parsers += [
             Parser(name="DateRangeParser [en]", fun=drp_parse_english),
+            Parser(name="DateRangeParser [de]", fun=drp_parse_german),
             Parser(name="arbitrary-dateparser [en]", fun=adp_parse_english),
         ]
 
