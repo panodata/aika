@@ -72,7 +72,7 @@ develop = [
   "build<1",
   "mypy==1.5.1",
   "poethepoet<1",
-  "pyproject-fmt<1.1",
+  "pyproject-fmt<1.2",
   "ruff==0.0.285",
   "validate-pyproject<0.15",
 ]
