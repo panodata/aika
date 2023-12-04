@@ -83,7 +83,7 @@ release = [
 ]
 test = [
   "coverage<8",
-  "freezegun<1.3",
+  "freezegun<1.4",
   "pytest<8",
 ]
 [tool.setuptools]
