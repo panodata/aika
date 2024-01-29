@@ -84,7 +84,7 @@ release = [
 test = [
   "coverage<8",
   "freezegun<1.5",
-  "pytest<8",
+  "pytest<9",
 ]
 [tool.setuptools]
 # https://setuptools.pypa.io/en/latest/userguide/package_discovery.html
