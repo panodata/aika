@@ -84,9 +84,9 @@ release = [
   "twine<5",
 ]
 test = [
-  "coverage<8",
   "freezegun<1.5",
   "pytest<9",
+  "pytest-cov<5",
 ]
 [tool.setuptools]
 # https://setuptools.pypa.io/en/latest/userguide/package_discovery.html
@@ -109,6 +109,7 @@ skip_gitignore = false
 minversion = "2.0"
 addopts = """
   -rfEX -p pytester --strict-markers --verbosity=3
+  --cov --cov-report=term-missing --cov-report=xml
   """
 log_level = "DEBUG"
 log_cli_level = "DEBUG"
