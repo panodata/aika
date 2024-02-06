@@ -22,9 +22,11 @@ readme = "README.md"
 requires-python = ">=3.8"
 license = { text = "LGPL 3, EUPL 1.2" }
 keywords = [
-  "open data",
-  "public transport",
-  "routing",
+  "date",
+  "time",
+  "parsing",
+  "utility",
+  "multi-language",
 ]
 authors = [
   {name = "Andreas Motl", email = "andreas.motl@panodata.org"},
