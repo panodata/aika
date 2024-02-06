@@ -55,6 +55,9 @@ jobs:
         # https://github.com/pypa/setuptools/blob/main/CHANGES.rst#v6400
         pip install "setuptools>=64" --upgrade
 
+        # Install `wheel` package.
+        pip install wheel
+
         # Install package in editable mode.
         # FIXME: Workaround for installing pendulum 2.x on Python 3.12.
         # https://github.com/sdispater/pendulum/issues/454#issuecomment-654096754
