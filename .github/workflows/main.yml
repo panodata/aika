@@ -55,6 +55,9 @@ jobs:
         # https://github.com/pypa/setuptools/blob/main/CHANGES.rst#v6400
         pip install "setuptools>=64" --upgrade
 
+        # Install `wheel` package.
+        pip install wheel
+
         # Install package in editable mode.
         pip install --use-pep517 --prefer-binary --no-build-isolation --editable=.[develop,docs,test]
 
