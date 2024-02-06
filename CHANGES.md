@@ -2,7 +2,7 @@
 
 
 ## in progress
-
+- Maintenance: Add support for macOS, Windows, and Python 3.12
 
 ## 2023-08-23 v0.1.0
 - Initial thing, using `arbitrary-dateparser` and `DateRangeParser` packages
