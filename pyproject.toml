@@ -61,7 +61,7 @@ classifiers = [
 ]
 
 dependencies = [
-  "arbitrary-dateparser==0.0.4",
+  "arbitrary-dateparser @ git+https://github.com/pyveci/arbitrary-dateparser@pendulum2",
   "DateRangeParser<1.4",
 ]
 
