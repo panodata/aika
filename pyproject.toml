@@ -72,7 +72,7 @@ dynamic = [
 [project.optional-dependencies]
 develop = [
   "black<25",
-  "mypy<1.10",
+  "mypy<1.11",
   "poethepoet<1",
   "pyproject-fmt<1.8",
   "ruff<0.5",
