@@ -73,7 +73,7 @@ dynamic = [
 develop = [
   "mypy<1.11",
   "poethepoet<1",
-  "pyproject-fmt<2.2",
+  "pyproject-fmt<2.3",
   "ruff<0.6",
   "validate-pyproject<0.19",
 ]
