@@ -75,7 +75,7 @@ develop = [
   "poethepoet<1",
   "pyproject-fmt<2.5",
   "ruff<0.8",
-  "validate-pyproject<0.22",
+  "validate-pyproject<0.23",
 ]
 release = [
   "build<2",
