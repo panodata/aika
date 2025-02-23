@@ -60,17 +60,19 @@ classifiers = [
   "Topic :: Utilities",
 ]
 
-dependencies = [
-  "arbitrary-dateparser==0.0.4",
-  "DateRangeParser<1.4",
-]
-
 dynamic = [
   "version",
 ]
 
-[project.optional-dependencies]
-develop = [
+dependencies = [
+  "arbitrary-dateparser==0.0.4; python_version<'3.12'",
+  "dateparser<1.3",
+  "daterangeparser<1.4",
+  "fiscalyear<0.5",
+  "python-dateutil<3",
+]
+
+optional-dependencies.develop = [
   "mypy<1.16",
   "poethepoet<1",
   "pyproject-fmt<2.6",
