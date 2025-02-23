@@ -33,7 +33,7 @@ before_midnight = dt.time(hour=23, minute=59, second=59, microsecond=999999)
 midnights = [dt.time(hour=0, minute=0, second=0), before_midnight]
 
 
-class DaterangeExpression:
+class TimeIntervalParser:
     """
     Unified date range parser, using multiple packages.
 
@@ -195,3 +195,7 @@ def dudp_parse(when: str) -> trange:
         t_end = dt.datetime.today().replace(hour=23, minute=59, second=59, microsecond=999999)
 
     return t_start, t_end
+
+
+class DaterangeExpression(TimeIntervalParser):
+    pass
