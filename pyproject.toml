@@ -11,27 +11,24 @@ requires = [
   "versioningit",
 ]
 
-[tool.versioningit.vcs]
-method = "git"
-default-tag = "0.0.0"
-
 [project]
 name = "aika"
 description = "Date- and time-range parsing utilities for multiple languages"
 readme = "README.md"
-requires-python = ">=3.8"
-license = { text = "LGPL 3, EUPL 1.2" }
 keywords = [
-  "date",
+  "date parsing",
   "multi-language",
-  "parsing",
   "time",
+  "time interval",
+  "time range",
   "utility",
 ]
+license = { text = "LGPL 3, EUPL 1.2" }
 authors = [
-  {name = "Andreas Motl", email = "andreas.motl@panodata.org"},
-  {name = "Richard Pobering", email = "richard.pobering@panodata.org"},
+  { name = "Andreas Motl", email = "andreas.motl@panodata.org" },
+  { name = "Richard Pobering", email = "richard.pobering@panodata.org" },
 ]
+requires-python = ">=3.8"
 classifiers = [
   "Development Status :: 3 - Alpha",
   "Environment :: Console",
@@ -53,6 +50,7 @@ classifiers = [
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
   "Topic :: Communications",
   "Topic :: Education",
   "Topic :: Home Automation",
@@ -79,44 +77,85 @@ optional-dependencies.develop = [
   "ruff<0.10",
   "validate-pyproject<0.24",
 ]
-release = [
+optional-dependencies.release = [
   "build<2",
-  'minibump<1; python_version >= "3.10"',
   "twine<7",
 ]
-test = [
+optional-dependencies.test = [
   "freezegun<1.6",
   "pytest<9",
   "pytest-cov<7",
 ]
+urls.Changelog = "https://github.com/panodata/aika/blob/main/CHANGES.md"
+urls.Issues = "https://github.com/panodata/aika/issues"
+urls.Repository = "https://github.com/panodata/aika"
+
 [tool.setuptools]
 # https://setuptools.pypa.io/en/latest/userguide/package_discovery.html
-packages = ["aika"]
+packages = [ "aika" ]
 
-[project.urls]
-changelog = "https://github.com/panodata/aika/blob/main/CHANGES.md"
-documentation = "https://github.com/panodata/aika"
-homepage = "https://github.com/panodata/aika"
-repository = "https://github.com/panodata/aika"
 [tool.black]
 line-length = 120
+
+[tool.ruff]
+line-length = 120
+
+extend-exclude = [
+  "examples/*",
+]
+
+lint.select = [
+  # Builtins
+  "A",
+  # Bugbear
+  "B",
+  # comprehensions
+  "C4",
+  # Pycodestyle
+  "E",
+  # eradicate
+  "ERA",
+  # Pyflakes
+  "F",
+  # isort
+  "I",
+  # pandas-vet
+  "PD",
+  # return
+  "RET",
+  # Bandit
+  "S",
+  # print
+  "T20",
+  "W",
+  # flake8-2020
+  "YTT",
+]
+
+lint.ignore = [
+  "RET505", # Unnecessary `elif` after `return` statement
+]
+
+lint.per-file-ignores."aika/cli.py" = [ "T201" ] # Allow `print`
+lint.per-file-ignores."tests/*" = [ "S101" ]     # Use of `assert` detected
 
 [tool.pytest.ini_options]
 minversion = "2.0"
 addopts = """
   -rfEX -p pytester --strict-markers --verbosity=3
   --cov --cov-report=term-missing --cov-report=xml
+  --capture=no
   """
 log_level = "DEBUG"
 log_cli_level = "DEBUG"
-testpaths = ["tests"]
+testpaths = [ "tests" ]
 xfail_strict = true
 markers = [
 ]
 
 [tool.coverage.run]
 branch = false
-source = ["aika"]
+source = [ "aika" ]
 
 [tool.coverage.report]
 fail_under = 0
@@ -125,7 +164,7 @@ omit = [
 ]
 
 [tool.mypy]
-packages = ["aika"]
+packages = [ "aika" ]
 exclude = [
 ]
 check_untyped_defs = true
@@ -139,49 +178,9 @@ strict_equality = true
 warn_unused_ignores = true
 warn_redundant_casts = true
 
-[tool.ruff]
-line-length = 120
-
-lint.select = [
-  # Bandit
-  "S",
-  # Bugbear
-  "B",
-  # Builtins
-  "A",
-  # comprehensions
-  "C4",
-  # eradicate
-  "ERA",
-  # flake8-2020
-  "YTT",
-  # isort
-  "I",
-  # pandas-vet
-  "PD",
-  # print
-  "T20",
-  # Pycodestyle
-  "E",
-  "W",
-  # Pyflakes
-  "F",
-  # return
-  "RET",
-]
-
-lint.ignore = [
-  "RET505",  # Unnecessary `elif` after `return` statement
-]
-
-extend-exclude = [
-  "examples/*",
-]
-
-[tool.ruff.lint.per-file-ignores]
-"tests/*" = ["S101"]  # Use of `assert` detected
-"aika/cli.py" = ["T201"]  # Allow `print`
-
+[tool.versioningit.vcs]
+method = "git"
+default-tag = "0.0.0"
 
 # ===================
 # Tasks configuration
@@ -189,7 +188,7 @@ extend-exclude = [
 
 [tool.poe.tasks]
 
-check = ["lint", "test"]
+check = [ "lint", "test" ]
 
 format = [
   { cmd = "ruff format ." },
