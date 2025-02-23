@@ -5,16 +5,15 @@ import datetime as dt
 
 from freezegun import freeze_time
 
-from aika import DaterangeExpression
-from tests import TESTDRIVE_DATETIME
+from aika import TimeIntervalParser
+from tests.conftest import TESTDRIVE_DATETIME
 
 
 @freeze_time(TESTDRIVE_DATETIME)
-def test_single_empty():
+def test_single_empty(dr):
     """
     An empty date range constraint should yield the same result as when using "now".
     """
-    dr = DaterangeExpression()
     assert (
         dr.parse("")
         == dr.parse("now")
@@ -27,8 +26,7 @@ def test_single_empty():
 
 
 @freeze_time(TESTDRIVE_DATETIME)
-def test_single_relative_now_today():
-    dr = DaterangeExpression()
+def test_single_relative_now_today(dr):
     assert (
         dr.parse("today")
         == dr.parse("heute")
@@ -48,8 +46,7 @@ def test_single_relative_now_today():
 
 
 @freeze_time(TESTDRIVE_DATETIME)
-def test_single_relative_friday():
-    dr = DaterangeExpression()
+def test_single_relative_friday(dr):
     assert (
         dr.parse_single("friday")
         == dr.parse_single("current friday")
@@ -67,8 +64,7 @@ def test_single_relative_friday():
 
 
 @freeze_time(TESTDRIVE_DATETIME)
-def test_single_absolute():
-    dr = DaterangeExpression()
+def test_single_absolute(dr):
     assert (
         dr.parse_single("August 20 2024")
         == dr.parse_single("August, 20 2024")
@@ -81,12 +77,11 @@ def test_single_absolute():
 
 
 @freeze_time(TESTDRIVE_DATETIME)
-def test_range_basics():
+def test_range_basics(dr):
     # Make the parser exclusively use `arbitrary-dateparser`,
     # to make sure it does not get parsed by `DateRangeParser`.
     from aika.core import adp_parse_english, adp_parse_german
 
-    dr = DaterangeExpression()
     dr.clear_parsers()
     dr.add_parser(name="arbitrary-dateparser [de]", fun=adp_parse_german)
     dr.add_parser(name="arbitrary-dateparser [en]", fun=adp_parse_english)
@@ -103,8 +98,7 @@ def test_range_basics():
 
 
 @freeze_time(TESTDRIVE_DATETIME)
-def test_range_relative():
-    dr = DaterangeExpression()
+def test_range_relative(dr):
     assert (
         dr.parse("tomorrow to next thursday")
         == dr.parse("morgen bis nächsten donnerstag")
@@ -142,9 +136,11 @@ def test_range_relative():
 
 @freeze_time(TESTDRIVE_DATETIME)
 def test_default_start_end_time():
-    dr = DaterangeExpression(
+    dr = TimeIntervalParser(
+        midnight_heuristics=True,
         default_start_time=dt.time(hour=9),
         default_end_time=dt.time(hour=17),
+        return_tuple=True,
     )
     assert dr.parse("jul 1 to jul 7") == (
         dt.datetime(2023, 7, 1, 9, 0),
@@ -167,9 +163,11 @@ def test_default_start_end_time():
 
 @freeze_time(TESTDRIVE_DATETIME)
 def test_range_relative_weekdays():
-    dr = DaterangeExpression(
+    dr = TimeIntervalParser(
+        midnight_heuristics=True,
         default_start_time=dt.time(hour=9),
         default_end_time=dt.time(hour=17),
+        return_tuple=True,
     )
     assert (
         dr.parse("from Saturday to Tuesday")
@@ -186,9 +184,11 @@ def test_range_relative_weekdays():
 
 @freeze_time(TESTDRIVE_DATETIME)
 def test_months():
-    dr = DaterangeExpression(
+    dr = TimeIntervalParser(
+        midnight_heuristics=True,
         default_start_time=dt.time(hour=9),
         default_end_time=dt.time(hour=17),
+        return_tuple=True,
     )
     assert (
         dr.parse("in March")

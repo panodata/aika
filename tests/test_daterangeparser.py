@@ -5,13 +5,12 @@ import datetime as dt
 
 from freezegun import freeze_time
 
-from aika import DaterangeExpression
-from tests import TESTDRIVE_DATETIME
+from aika import TimeIntervalParser
+from tests.conftest import TESTDRIVE_DATETIME
 
 
 @freeze_time(TESTDRIVE_DATETIME)
-def test_range_basics():
-    dr = DaterangeExpression()
+def test_range_basics(dr):
     assert (
         dr.parse("jul 1 to jul 7")
         == dr.parse("juli 1 bis juli 7")
@@ -32,8 +31,7 @@ def test_range_basics():
 
 
 @freeze_time(TESTDRIVE_DATETIME)
-def test_single_parse_basics():
-    dr = DaterangeExpression()
+def test_single_parse_basics(dr):
     assert (
         dr.parse("1st july")
         == dr.parse("1 juli")
@@ -54,19 +52,20 @@ def test_single_parse_basics():
 
 
 @freeze_time(TESTDRIVE_DATETIME)
-def test_single_parse_single_basics():
+def test_single_parse_single_basics(dr):
     """
     Verify the `parse_single` method.
     """
-    dr = DaterangeExpression()
     assert dr.parse_single("1. juli") == dr.parse_single("1. juli") == dt.datetime(2023, 7, 1, 0, 0)
 
 
 @freeze_time(TESTDRIVE_DATETIME)
 def test_months():
-    dr = DaterangeExpression(
+    dr = TimeIntervalParser(
+        midnight_heuristics=True,
         default_start_time=dt.time(hour=9),
         default_end_time=dt.time(hour=17),
+        return_tuple=True,
     )
     assert (
         dr.parse("March")
@@ -88,9 +87,11 @@ def test_months():
 
 @freeze_time(TESTDRIVE_DATETIME)
 def test_humanized_german():
-    dr = DaterangeExpression(
+    dr = TimeIntervalParser(
+        midnight_heuristics=True,
         default_start_time=dt.time(hour=9),
         default_end_time=dt.time(hour=17),
+        return_tuple=True,
     )
     assert dr.parse("Vom 3. März bis zum 9. März 2024") == (
         dt.datetime(2024, 3, 3, 9, 0, 0),
