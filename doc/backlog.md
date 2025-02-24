@@ -26,3 +26,7 @@
 - Synchronize splitters/separators from both libraries
 - Do not require locales for other languages to be installed.
   If not, handle it gracefully.
+- Use DateTimeRange?
+  https://github.com/panodata/aika/issues/46
+- Use portion?
+  https://github.com/AlexandreDecan/portion

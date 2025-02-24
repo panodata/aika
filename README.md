@@ -1,5 +1,6 @@
 # Aika
 
+Time interval parsing utilities for multiple languages.
 
 ## About
 
@@ -51,6 +52,7 @@ a few examples.
 - Year: 2025
 
 ##### Time deltas
+- Day: `-1d`, `-1 day`
 - Week: `-1w`, `-1 week`
 - Month: `-1M`, `-1 month`
 - Year: `-1y`, `-1 year`

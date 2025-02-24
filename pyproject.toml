@@ -13,7 +13,7 @@ requires = [
 
 [project]
 name = "aika"
-description = "Date- and time-range parsing utilities for multiple languages"
+description = "Time interval parsing utilities for multiple languages."
 readme = "README.md"
 keywords = [
   "date parsing",
