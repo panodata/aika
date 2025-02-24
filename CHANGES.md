@@ -1,6 +1,8 @@
 # Changelog
 
 ## in progress
+
+## 2025-02-24 v0.3.0
 - Naming things: Renamed argument `snap_days` to `snap_hours`
 - Formatting: Added formatter for Opsgenie API query clause
 - Formatting: Added formatter for GitHub Search API query clause
