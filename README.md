@@ -4,11 +4,12 @@
 ## About
 
 Aika provides date- and time-range parsing utilities for multiple languages.
-It is based on [arbitrary-dateparser] and [DateRangeParser], and aims for
-[DWIM]-like convenience and usefulness.
+It is based on [dateparser], [arbitrary-dateparser], and [DateRangeParser],
+and aims for [DWIM]-like convenience and usefulness.
 
-Currently, it supports English and German, and welcomes contributions for
-other languages.
+Currently, it supports 200 language locales through `dateparser`, and more
+specific support for English and German through `arbitrary-dateparser`.
+Contributions for other languages are welcome.
 
 
 ## Setup
@@ -21,16 +22,17 @@ pip install --upgrade aika
 
 ## Usage
 
-```python
-from aika import DaterangeExpression
-
-dr = DaterangeExpression()
-print("Range: ", dr.parse("Sat - Tue"))
-print("Single:", dr.parse_single("1. Juli"))
-```
-```python
-Range:  (datetime(2023, 8, 26, 0, 0), datetime(2023, 8, 29, 23, 59, 59, 999999))
-Single: datetime(2023, 7, 1, 0, 0)
+```doctest
+>>> import datetime as dt
+>>> from aika import TimeIntervalParser
+>>> 
+>>> ti = TimeIntervalParser()
+>>>
+>>> ti.parse("Sat - Tue")
+>>> (dt.datetime(2023, 8, 26, 0, 0), dt.datetime(2023, 8, 29, 23, 59, 59, 999999))
+>>>
+>>> ti.parse_single("1. Juli")
+>>> dt.datetime(2023, 7, 1, 0, 0)
 ```
 
 
@@ -39,6 +41,13 @@ Single: datetime(2023, 7, 1, 0, 0)
 Aika understands all types of date-/time-range expressions like provided by the
 packages it is based upon, and works with single dates too. This section enumerates
 a few examples.
+
+#### dateparser
+
+- Week: 2025W01
+- Month: 2025M02, 2025-02
+- Quarter: 2025Q03
+- Year: 2025
 
 #### arbitrary-dateparser » English
 
@@ -104,9 +113,10 @@ daterange boundaries will snap to the given times when they otherwise would be
 
 ```python
 import datetime as dt
-from aika import DaterangeExpression
+from aika import TimeIntervalParser
 
-dr = DaterangeExpression(
+dr = TimeIntervalParser(
+    snap_days=True,
     default_start_time=dt.time(hour=9),
     default_end_time=dt.time(hour=17),
 )
@@ -122,6 +132,8 @@ dr.parse("Sat - Tue")
 If you see an error message like `locale.Error: unsupported locale setting` for
 code like this,
 ```python
+import locale
+
 locale.setlocale(locale.LC_ALL, "de_DE.UTF-8")
 ```
 
@@ -139,9 +151,9 @@ Acquire source code and install development sandbox.
 ```shell
 git clone https://github.com/panodata/aika
 cd aika
-python3 -m venv .venv
+uv venv --seed --python 3.11
 source .venv/bin/activate
-pip install --editable='.[develop,docs,test]'
+uv pip install --editable='.[develop,docs,test]'
 ```
 
 Run linters and software tests:
@@ -155,15 +167,17 @@ poe check
 
 Aika means "time" in the Finnish language.
 
-
 ## Acknowledgements
 
+- [Elias Dorneles] and contributors for conceiving and maintaining [dateparser].
 - [Michael Phelps] for conceiving [arbitrary-dateparser].
 - [Robin Wilson] and contributors for conceiving and maintaining [DateRangeParser].
 
 
 [arbitrary-dateparser]: https://pypi.org/project/arbitrary-dateparser/
+[dateparser]: https://pypi.org/project/dateparser/
 [DateRangeParser]: https://pypi.org/project/DateRangeParser/
 [DWIM]: https://en.wikipedia.org/wiki/DWIM
+[Elias Dorneles]: https://github.com/eliasdorneles
 [Michael Phelps]: https://github.com/nottheswimmer
 [Robin Wilson]: https://github.com/robintw
