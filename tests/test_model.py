@@ -1,12 +1,36 @@
-import pytest
+import datetime as dt
 
-from aika import TimeIntervalParser
+import pytest
+from freezegun import freeze_time
+
+from aika import TimeInterval, TimeIntervalParser
+from tests.conftest import TESTDRIVE_DATETIME
 
 
 @pytest.fixture
 def interval():
     tip = TimeIntervalParser()
     return tip.parse("july 2023")
+
+
+def test_interval_create_void():
+    with pytest.raises(TypeError) as ex:
+        TimeInterval()
+    assert ex.match("missing 1 required positional argument: 'start'")
+
+
+@freeze_time(TESTDRIVE_DATETIME)
+def test_interval_create_start():
+    ti = TimeInterval(dt.datetime.now())
+    assert str(ti) == "TimeInterval(start=FakeDatetime(2023, 8, 17, 21, 3, 17), end=None)"
+
+
+@freeze_time(TESTDRIVE_DATETIME)
+def test_interval_create_full():
+    ti = TimeInterval(dt.datetime.now(), dt.datetime.now())
+    assert (
+        str(ti) == "TimeInterval(start=FakeDatetime(2023, 8, 17, 21, 3, 17), end=FakeDatetime(2023, 8, 17, 21, 3, 17))"
+    )
 
 
 def test_interval_format_github(interval):
