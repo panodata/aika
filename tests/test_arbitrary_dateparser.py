@@ -143,7 +143,7 @@ def test_range_relative(dr):
 def test_default_start_end_time():
     dr = TimeIntervalParser(
         midnight_heuristics=True,
-        snap_days=True,
+        snap_hours=True,
         default_start_time=dt.time(hour=9),
         default_end_time=dt.time(hour=17),
         return_tuple=True,
@@ -171,7 +171,7 @@ def test_default_start_end_time():
 @freeze_time(TESTDRIVE_DATETIME)
 def test_range_relative_weekdays():
     dr = TimeIntervalParser(
-        snap_days=True,
+        snap_hours=True,
         default_start_time=dt.time(hour=9),
         default_end_time=dt.time(hour=17),
         return_tuple=True,

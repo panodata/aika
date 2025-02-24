@@ -49,14 +49,14 @@ class TimeIntervalParser:
         default_start_time: t.Optional[dt.time] = None,
         default_end_time: t.Optional[dt.time] = None,
         midnight_heuristics: bool = False,
-        snap_days: bool = False,
+        snap_hours: bool = False,
         return_tuple: bool = False,
     ):
         self.default_start_time = default_start_time
         self.default_end_time = default_end_time
         self.return_tuple = return_tuple
         self.midnight_heuristics = midnight_heuristics
-        self.snap_days = snap_days
+        self.snap_hours = snap_hours
         self.parsers: t.List[Parser] = []
         self.use_all_parsers()
 
@@ -97,7 +97,7 @@ class TimeIntervalParser:
 
         # A specific datetime must not be changed through `default_start_time`.
         is_now = when in self.NOW
-        if self.snap_days and not is_now:
+        if self.snap_hours and not is_now:
             if self.default_start_time is not None:
                 date_start = dt.datetime.combine(date_start, self.default_start_time)
             if date_end is not None and self.default_end_time is not None:
@@ -163,7 +163,7 @@ class TimeIntervalParser:
             parser = dateparser.date.DateDataParser()
             response = parser.get_date_data(when)
             t_start = response.date_obj
-            if self.snap_days:
+            if self.snap_hours:
                 if when in self.TODAY and t_start is not None:
                     t_start = t_start.replace(hour=0, minute=0, second=0, microsecond=0)
 
@@ -216,7 +216,7 @@ def from_pendulum(period: "pandulum.Period") -> trange:
 
 class DaterangeExpression(TimeIntervalParser):
     def __init__(self, *args, **kwargs):
-        kwargs.setdefault("snap_days", True)
+        kwargs.setdefault("snap_hours", True)
         kwargs.setdefault("midnight_heuristics", True)
         kwargs.setdefault("return_tuple", True)
         super().__init__(*args, **kwargs)

@@ -126,7 +126,7 @@ import datetime as dt
 from aika import TimeIntervalParser
 
 dr = TimeIntervalParser(
-    snap_days=True,
+    snap_hours=True,
     default_start_time=dt.time(hour=9),
     default_end_time=dt.time(hour=17),
 )
