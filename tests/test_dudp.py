@@ -35,3 +35,13 @@ def test_quarter(ti):
         dt.datetime(2025, 1, 1, 0, 0),
         dt.datetime(2025, 3, 31, 23, 59, 59),
     )
+
+
+def test_year(ti):
+    """
+    Test years.
+    """
+    assert ti.parse("2025") == TimeInterval(
+        dt.datetime(2025, 1, 1, 0, 0),
+        dt.datetime(2026, 1, 1, 0, 0, 0),
+    )

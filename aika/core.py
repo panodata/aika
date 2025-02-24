@@ -10,7 +10,7 @@ import dateparser
 import dateutil.parser.isoparser
 import fiscalyear
 from daterangeparser import parse as drp_parse_english
-from dateutil.rrule import MONTHLY, WEEKLY
+from dateutil.rrule import MONTHLY, WEEKLY, YEARLY
 
 from .daterangeparser_german import parse_german as drp_parse_german
 from .model import Parser, TimeInterval, trange
@@ -147,7 +147,9 @@ class TimeIntervalParser:
             return q.start, q.end
 
         interval = None
-        if "M" in when or (when.count("-") == 1):
+        if len(when) == 4 and when.isnumeric():
+            interval = YEARLY
+        elif "M" in when or (when.count("-") == 1):
             when = when.replace("M", "-")
             interval = MONTHLY
         elif "W" in when:
@@ -155,9 +157,9 @@ class TimeIntervalParser:
 
         t_start: t.Optional[dt.datetime] = None
         try:
-            if "-" in when or "W" in when:
+            try:
                 t_start = dateutil.parser.isoparse(when)
-            else:
+            except Exception:
                 t_start = dateutil.parser.parse(when)
         except dateutil.parser.ParserError:
             parser = dateparser.date.DateDataParser()
@@ -171,10 +173,12 @@ class TimeIntervalParser:
             raise ValueError(f"Failed parsing date range: {when}")
 
         t_end: t.Optional[dt.datetime] = None
-        if interval == MONTHLY:
+        if interval == YEARLY:
+            t_end = t_start + dt.timedelta(days=365)
+        elif interval == MONTHLY:
             t_end = t_start + dt.timedelta(days=31)
         elif interval == WEEKLY:
-            t_end = t_start + dt.timedelta(weeks=1)
+            t_end = t_start + dt.timedelta(days=7)
         else:
             t_end = dt.datetime.today().replace(hour=23, minute=59, second=59, microsecond=999999)
 
