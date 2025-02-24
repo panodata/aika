@@ -1,13 +1,13 @@
 import pytest
 
-from aika import TimeIntervalParser
+from aika import DaterangeExpression, TimeIntervalParser
 
 TESTDRIVE_DATETIME = "2023-08-17T23:03:17+0200"
 
 
 @pytest.fixture
 def dr():
-    return TimeIntervalParser(midnight_heuristics=True, return_tuple=True)
+    return DaterangeExpression()
 
 
 @pytest.fixture

@@ -2,7 +2,9 @@
 # Distributed under the terms of the LGPL license, see LICENSE.
 
 import datetime as dt
+import sys
 
+import pytest
 from freezegun import freeze_time
 
 from aika import TimeIntervalParser
@@ -26,15 +28,7 @@ def test_single_empty(dr):
 
 
 @freeze_time(TESTDRIVE_DATETIME)
-def test_single_relative_now_today(dr):
-    assert (
-        dr.parse("today")
-        == dr.parse("heute")
-        == (
-            dt.datetime(2023, 8, 17, 0, 0, 0),
-            dt.datetime(2023, 8, 17, 23, 59, 59, 999999),
-        )
-    )
+def test_single_relative_now(dr):
     assert (
         dr.parse("now")
         == dr.parse("jetzt")
@@ -45,6 +39,20 @@ def test_single_relative_now_today(dr):
     )
 
 
+@freeze_time(TESTDRIVE_DATETIME)
+def test_single_relative_today(dr):
+    assert (
+        dr.parse("today")
+        == dr.parse("heute")
+        == (
+            dt.datetime(2023, 8, 17, 0, 0, 0),
+            dt.datetime(2023, 8, 17, 23, 59, 59, 999999),
+        )
+    )
+
+
+# TODO: How to make it work using the `dateparser` package?
+@pytest.mark.skipif(sys.version_info >= (3, 12), reason="arbitrary-dateparser only available for Python <= 3.11")
 @freeze_time(TESTDRIVE_DATETIME)
 def test_single_relative_friday(dr):
     assert (
@@ -76,6 +84,8 @@ def test_single_absolute(dr):
     )
 
 
+# TODO: How to make it work using the `dateparser` package?
+@pytest.mark.skipif(sys.version_info >= (3, 12), reason="arbitrary-dateparser only available for Python <= 3.11")
 @freeze_time(TESTDRIVE_DATETIME)
 def test_range_basics(dr):
     # Make the parser exclusively use `arbitrary-dateparser`,
@@ -97,6 +107,8 @@ def test_range_basics(dr):
     )
 
 
+# TODO: How to make it work using the `dateparser` package?
+@pytest.mark.skipif(sys.version_info >= (3, 12), reason="arbitrary-dateparser only available for Python <= 3.11")
 @freeze_time(TESTDRIVE_DATETIME)
 def test_range_relative(dr):
     assert (
@@ -138,6 +150,7 @@ def test_range_relative(dr):
 def test_default_start_end_time():
     dr = TimeIntervalParser(
         midnight_heuristics=True,
+        snap_days=True,
         default_start_time=dt.time(hour=9),
         default_end_time=dt.time(hour=17),
         return_tuple=True,
@@ -155,12 +168,15 @@ def test_default_start_end_time():
         dt.datetime(2023, 8, 17, 23, 3, 17),
         dt.datetime(2023, 8, 17, 17, 0, 0),
     )
-    assert dr.parse("tomorrow to next thursday") == (
-        dt.datetime(2023, 8, 18, 9, 0, 0),
-        dt.datetime(2023, 8, 24, 17, 0, 0),
-    )
+    if sys.version_info < (3, 12):
+        assert dr.parse("tomorrow to next thursday") == (
+            dt.datetime(2023, 8, 18, 9, 0, 0),
+            dt.datetime(2023, 8, 24, 17, 0, 0),
+        )
 
 
+# TODO: How to make it work using the `dateparser` package?
+@pytest.mark.skipif(sys.version_info >= (3, 12), reason="arbitrary-dateparser only available for Python <= 3.11")
 @freeze_time(TESTDRIVE_DATETIME)
 def test_range_relative_weekdays():
     dr = TimeIntervalParser(
@@ -182,6 +198,8 @@ def test_range_relative_weekdays():
     )
 
 
+# TODO: How to make it work using the `dateparser` package?
+@pytest.mark.skipif(sys.version_info >= (3, 12), reason="arbitrary-dateparser only available for Python <= 3.11")
 @freeze_time(TESTDRIVE_DATETIME)
 def test_months():
     dr = TimeIntervalParser(
