@@ -9,6 +9,10 @@ def interval():
     return tip.parse("july 2023")
 
 
+def test_interval_format_github(interval):
+    assert interval.githubformat() == "2023-07-01..2023-07-31"
+
+
 def test_interval_format_iso(interval):
     assert interval.isoformat() == "2023-07-01T00:00:00/2023-07-31T00:00:00"
 

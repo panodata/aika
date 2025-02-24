@@ -3,6 +3,7 @@
 ## in progress
 - Naming things: Renamed argument `snap_days` to `snap_hours`
 - Formatting: Added formatter for Opsgenie API query clause
+- Formatting: Added formatter for GitHub Search API query clause
 
 ## 2025-02-24 v0.2.1
 - Emit better error message when German locales are not installed
