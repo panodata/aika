@@ -1,6 +1,7 @@
 # Changelog
 
 ## in progress
+- Naming things: Rename argument `snap_days` to `snap_hours`
 
 ## 2025-02-24 v0.2.1
 - Emit better error message when German locales are not installed
