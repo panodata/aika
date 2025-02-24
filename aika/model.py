@@ -60,3 +60,16 @@ class TimeInterval:
         if self.end:
             buffer += f"..{self.end.isoformat()}"
         return buffer
+
+    def opsgenieformat(self) -> str:
+        """
+        Encode as an Opsgenie API range query. DD-MM-YYYY time format.
+        Example: `createdAt >= "24-02-2025T12:24:22" and createdAt <= "24-02-2025T23:59:59"`
+
+        https://support.atlassian.com/opsgenie/docs/search-queries-for-alerts/
+        """
+        opsgenie_datetime_format = "%d-%m-%YT%H:%M:%S"
+        buffer = f'createdAt >= "{self.start.strftime(opsgenie_datetime_format)}"'
+        if self.end:
+            buffer += f' and createdAt <= "{self.end.strftime(opsgenie_datetime_format)}"'
+        return buffer
