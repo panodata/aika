@@ -4,7 +4,6 @@
 import datetime as dt
 import logging
 import typing as t
-import warnings
 
 import dateparser
 import dateutil.parser.isoparser
@@ -12,25 +11,26 @@ import fiscalyear
 from daterangeparser import parse as drp_parse_english
 from dateutil.rrule import MONTHLY, WEEKLY, YEARLY
 
+from .arbitrary_dateparser import DateParser
+from .dateparser_german import DateParserGerman
 from .daterangeparser_german import parse_german as drp_parse_german
 from .model import Parser, TimeInterval, trange
-
-try:
-    from arbitrary_dateparser import DateParser
-except ImportError:
-    warnings.warn(
-        "arbitrary-dateparser lacks support for recent versions of Python", category=ImportWarning, stacklevel=2
-    )
 
 if t.TYPE_CHECKING:
     import pandulum
 
 
-logger = logging.getLogger(__name__)
+# FIXME: Do not set timezone explicitly.
+arbitrary_parser_english = DateParser(tz="Europe/Berlin")
+arbitrary_parser_english.replaced_words["in"] = "this"
+arbitrary_parser_german = DateParserGerman(tz="Europe/Berlin")
 
 
 before_midnight = dt.time(hour=23, minute=59, second=59, microsecond=999999)
 midnights = [dt.time(hour=0, minute=0, second=0), before_midnight]
+
+
+logger = logging.getLogger(__name__)
 
 
 class TimeIntervalParser:
@@ -147,7 +147,7 @@ class TimeIntervalParser:
             return q.start, q.end
 
         interval = None
-        if len(when) == 4 and when.isnumeric():
+        if (when.isnumeric() and len(when) == 4) or "year" in when:
             interval = YEARLY
         elif "M" in when or (when.count("-") == 1):
             when = when.replace("M", "-")
@@ -189,9 +189,6 @@ def adp_parse_english(when: str) -> trange:
     """
     Parse date range using `arbitrary-dateparser`. English variant.
     """
-    # FIXME: Do not set timezone explicitly.
-    arbitrary_parser_english = DateParser(tz="Europe/Berlin")
-    arbitrary_parser_english.replaced_words["in"] = "this"
     return from_pendulum(arbitrary_parser_english(when))
 
 
@@ -199,10 +196,7 @@ def adp_parse_german(when: str) -> trange:
     """
     Parse date range using `arbitrary-dateparser`. German variant.
     """
-    from .dateparser_german import DateParserGerman
 
-    # FIXME: Do not set timezone explicitly.
-    arbitrary_parser_german = DateParserGerman(tz="Europe/Berlin")
     return from_pendulum(arbitrary_parser_german(when))
 
 
