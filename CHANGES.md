@@ -1,6 +1,7 @@
 # Changelog
 
 ## in progress
+- Emit better error message when German locales are not installed
 
 ## 2025-02-24 v0.2.0
 - Maintenance: Add support for macOS, Windows, and Python 3.12 & 3.13
