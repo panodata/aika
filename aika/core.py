@@ -12,7 +12,6 @@ from daterangeparser import parse as drp_parse_english
 from dateutil.rrule import MONTHLY, WEEKLY, YEARLY
 
 from .arbitrary_dateparser import DateParser
-from .dateparser_german import DateParserGerman
 from .daterangeparser_german import parse_german as drp_parse_german
 from .model import Parser, TimeInterval, trange
 
@@ -23,7 +22,6 @@ if t.TYPE_CHECKING:
 # FIXME: Do not set timezone explicitly.
 arbitrary_parser_english = DateParser(tz="Europe/Berlin")
 arbitrary_parser_english.replaced_words["in"] = "this"
-arbitrary_parser_german = DateParserGerman(tz="Europe/Berlin")
 
 
 before_midnight = dt.time(hour=23, minute=59, second=59, microsecond=999999)
@@ -196,6 +194,9 @@ def adp_parse_german(when: str) -> trange:
     """
     Parse date range using `arbitrary-dateparser`. German variant.
     """
+    from .dateparser_german import DateParserGerman
+
+    arbitrary_parser_german = DateParserGerman(tz="Europe/Berlin")
 
     return from_pendulum(arbitrary_parser_german(when))
 

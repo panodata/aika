@@ -44,7 +44,7 @@ jobs:
     - name: Acquire sources
       uses: actions/checkout@v4
 
-    - name: Generate locales
+    - name: Install German locales
       if: runner.os == 'Linux'
       run: |
         sudo apt-get update && sudo apt-get install tzdata locales -y && sudo locale-gen de_DE.UTF-8
