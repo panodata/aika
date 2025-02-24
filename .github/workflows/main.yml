@@ -35,6 +35,7 @@ jobs:
     env:
       OS: ${{ matrix.os }}
       PYTHON: ${{ matrix.python-version }}
+      TZ: Europe/Berlin
       UV_SYSTEM_PYTHON: true
 
     name: Python ${{ matrix.python-version }} on OS ${{ matrix.os }}
