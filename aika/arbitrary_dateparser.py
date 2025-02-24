@@ -4,6 +4,7 @@ Contains the DateParser module and relevant constants.
 
 import calendar
 import re
+import typing as t
 from itertools import product
 
 import pendulum
@@ -17,10 +18,17 @@ DAY_NAMES_ABBREVIATED = [calendar.day_abbr[x].lower() for x in (6, *range(0, 6))
 
 
 class DateParser:
+    def __init__(
+        self,
+        tz="local",
+        support_periods=True,
+        always_return_period=True,
+        format_templates=None,
+        unfiltered_words: t.Optional[t.List[str]] = None,
+        strict=True,
+    ):
+        unfiltered_words = unfiltered_words or []
 
-    def __init__(self, tz="local", support_periods=True,
-                 always_return_period=True, format_templates=None,
-                 unfiltered_words=None, strict=True):
         # What timezone to use?
         self.tz = tz
 
@@ -39,31 +47,18 @@ class DateParser:
         # transformations.
 
         # These variables modify date ranges
-        self.splitters = {
-            ' to ',
-            ' - ',
-            ' through '
-        }
+        self.splitters = {" to ", " - ", " through "}
 
-        self.period_transformations = [
-            lambda s: s.lower(),
-            lambda s: s.strip()
-        ]
+        self.period_transformations = [lambda s: s.lower(), lambda s: s.strip()]
 
         # These variables modify dates
-        self.pre_word_replace_date_transformations = [
-            lambda s: s.lower(),
-            lambda s: s.strip()
-        ]
+        self.pre_word_replace_date_transformations = [lambda s: s.lower(), lambda s: s.strip()]
 
         # Formats are separated by spaces only. So convert any other separator
         # you want to a space.
-        self.space_strings = {'-', '/', '.', ','}
+        self.space_strings = {"-", "/", ".", ","}
 
-        self.replaced_words = {
-            'last': 'previous',
-            'current': 'this'
-        }
+        self.replaced_words = {"last": "previous", "current": "this"}
 
         for i, day in enumerate(DAY_NAMES):
             self.replaced_words[day] = DAY_NAMES_ABBREVIATED[i]
@@ -72,59 +67,60 @@ class DateParser:
 
         # These variables modify dates
         self.post_word_replace_date_transformations = [
-            lambda s: ' '.join(x for x in s.split(' ') if
-                               x in self.unfiltered_words or not x.isalpha()),
+            lambda s: " ".join(x for x in s.split(" ") if x in unfiltered_words or not x.isalpha()),
         ]
 
-        self.regex_replacements = {re.compile(x): y for x, y in {
-            r'(\d)st': r'\1',
-            r'(\d)nd': r'\1',
-            r'(\d)rd': r'\1',
-            r'(\d)th': r'\1',
-            r'\s+': ' ',
-        }.items()}
+        self.regex_replacements = {
+            re.compile(x): y
+            for x, y in {
+                r"(\d)st": r"\1",
+                r"(\d)nd": r"\1",
+                r"(\d)rd": r"\1",
+                r"(\d)th": r"\1",
+                r"\s+": " ",
+            }.items()
+        }
 
-        _day_formats = ('DD', 'D')  # {d}
-        _month_formats = ('MMMM', 'MMM', 'MM')  # {m}
-        _year_formats = ('YYYY', 'YY')  # {y}
-        _time_formats = ('LT', 'LTS')  # {t}
+        _day_formats = ("DD", "D")  # {d}
+        _month_formats = ("MMMM", "MMM", "MM")  # {m}
+        _year_formats = ("YYYY", "YY")  # {y}
+        _time_formats = ("LT", "LTS")  # {t}
 
         # All format templates must use title case. Conversion will be handled.
         if format_templates is None:
             format_templates = {
                 # Yearless
-                '{m} {d}',
-                '{d} [Of] {m}',
-                # # Monthless
-                # 'DDDD [Day Of] YYYY',
-                # # Dayless
-                # '{m} YYYY',
+                "{m} {d}",
+                "{d} [Of] {m}",
+                # Monthless
+                # 'DDDD [Day Of] YYYY',  # noqa: ERA001
+                # Dayless
+                # '{m} YYYY',  # noqa: ERA001
                 # Full
-                '{m} {d} {y}',
-                '{d} [Of] {m} {y}',
+                "{m} {d} {y}",
+                "{d} [Of] {m} {y}",
             }
             format_templates.update(
-                # {'%s {t}' % x for x in format_templates}
+                # {'%s {t}' % x for x in format_templates}  # noqa: ERA001
                 # | {'%s [At] {t}' % x for x in format_templates}
             )
 
-        self.date_formats = set(
-            f.format(d=d, m=m, y=y, t=t) for d, m, y, t, f in
-            product(_day_formats, _month_formats, _year_formats,
-                    _time_formats, format_templates))
+        self.date_formats = [
+            f.format(d=d, m=m, y=y, t=t)
+            for d, m, y, t, f in product(_day_formats, _month_formats, _year_formats, _time_formats, format_templates)
+        ]
 
         # Unfortunately this appears to be necessary for consistent behavior
         def _format_sorter(fmt):
             priority = 0
-            priority += ('YYYY' in fmt) * 1000
-            priority += ('MMM' in fmt) * 100
-            priority += ('MMM' not in fmt and 'MM' in fmt) * 10
-            priority += ('DD' in fmt) * 1
-            priority += 1 / len(fmt)
+            priority += ("YYYY" in fmt) * 1000
+            priority += ("MMM" in fmt) * 100
+            priority += ("MMM" not in fmt and "MM" in fmt) * 10
+            priority += ("DD" in fmt) * 1
+            priority += int(1 / len(fmt))
             return priority
 
-        self.date_formats = sorted(self.date_formats, key=_format_sorter,
-                                   reverse=True)
+        self.date_formats = sorted(self.date_formats, key=_format_sorter, reverse=True)
 
         # Words that are not filtered (replacements -> this -> regex)
         self.unfiltered_words = unfiltered_words
@@ -134,10 +130,18 @@ class DateParser:
             self.unfiltered_words = (
                 *MONTH_NAMES_ABBREVIATED,
                 *DAY_NAMES_ABBREVIATED,
-                *list(x.strip() for x in self.splitters),
-                'now', 'today', 'tomorrow', 'yesterday',
-                'this', 'previous', 'next',
-                'year', 'month', 'week', 'of'
+                *[x.strip() for x in self.splitters],
+                "now",
+                "today",
+                "tomorrow",
+                "yesterday",
+                "this",
+                "previous",
+                "next",
+                "year",
+                "month",
+                "week",
+                "of",
             )
 
         self.refresh_dates()
@@ -149,79 +153,68 @@ class DateParser:
         """
         self.now = pendulum.now(self.tz)
         self.today = pendulum.today(self.tz)
-        self.this_week = self.today.start_of('week')
+        self.this_week = self.today.start_of("week")
         self.next_week = self.this_week.add(weeks=1)
         self.previous_week = self.this_week.subtract(weeks=1)
-        self.this_month = self.today.start_of('month')
+        self.this_month = self.today.start_of("month")
         self.next_month = self.this_month.add(months=1)
         self.previous_month = self.this_month.subtract(months=1)
-        self.this_year = self.today.start_of('year')
+        self.this_year = self.today.start_of("year")
         self.next_year = self.this_year.add(years=1)
         self.previous_year = self.this_year.subtract(years=1)
 
         # Strings with direct date translations
         self.date_phrases = {
-            'now': self.now,
-            'today': self.today,
-            'tomorrow': self.today.add(days=1),
-            'yesterday': self.today.subtract(days=1),
-            'this month': self.this_month,
-            'next month': self.next_month,
-            'previous month': self.previous_month,
-            'this week': self.this_week,
-            'next week': self.next_week,
-            'previous week': self.previous_week,
-            'this year': self.this_year,
-            'next year': self.next_year,
-            'previous year': self.previous_year
+            "now": self.now,
+            "today": self.today,
+            "tomorrow": self.today.add(days=1),
+            "yesterday": self.today.subtract(days=1),
+            "this month": self.this_month,
+            "next month": self.next_month,
+            "previous month": self.previous_month,
+            "this week": self.this_week,
+            "next week": self.next_week,
+            "previous week": self.previous_week,
+            "this year": self.this_year,
+            "next year": self.next_year,
+            "previous year": self.previous_year,
         }
 
         # Strings with direct period translations
         self.period_phrases = {
-            'this month': pendulum.period(
-                self.this_month, self.this_month.end_of('month')),
-            'next month': pendulum.period(
-                self.next_month, self.next_month.end_of('month')),
-            'previous month': pendulum.period(
-                self.previous_month, self.previous_month.end_of('month')),
-            'this week': pendulum.period(
-                self.this_week, self.this_week.end_of('week')),
-            'next week': pendulum.period(
-                self.next_week, self.next_week.end_of('week')),
-            'previous week': pendulum.period(
-                self.previous_week, self.previous_week.end_of('week')),
-            'this year': pendulum.period(
-                self.this_year, self.this_year.end_of('year')),
-            'previous year': pendulum.period(
-                self.next_year, self.next_year.end_of('year'))
+            "this month": pendulum.period(self.this_month, self.this_month.end_of("month")),
+            "next month": pendulum.period(self.next_month, self.next_month.end_of("month")),
+            "previous month": pendulum.period(self.previous_month, self.previous_month.end_of("month")),
+            "this week": pendulum.period(self.this_week, self.this_week.end_of("week")),
+            "next week": pendulum.period(self.next_week, self.next_week.end_of("week")),
+            "previous week": pendulum.period(self.previous_week, self.previous_week.end_of("week")),
+            "this year": pendulum.period(self.this_year, self.this_year.end_of("year")),
+            "previous year": pendulum.period(self.next_year, self.next_year.end_of("year")),
         }
 
         for i, day in enumerate(DAY_NAMES_ABBREVIATED):
-            self.date_phrases[f'next {day}'] = self.today.next(i)
-            self.date_phrases[f'previous {day}'] = self.today.previous(i)
+            self.date_phrases[f"next {day}"] = self.today.next(i)
+            self.date_phrases[f"previous {day}"] = self.today.previous(i)
 
             if self.today.day_of_week == i:
                 self.date_phrases[day] = self.today
-                self.date_phrases[f'this {day}'] = self.today
+                self.date_phrases[f"this {day}"] = self.today
             else:
                 self.date_phrases[day] = self.today.next(i)
-                self.date_phrases[f'this {day}'] = self.today.next(i)
+                self.date_phrases[f"this {day}"] = self.today.next(i)
 
         for i, month in enumerate(MONTH_NAMES_ABBREVIATED):
-            self.date_phrases[f'next {month}'] = self.next_month.add(
-                months=(i + 1) - self.next_month.month)
-            self.date_phrases[f'previous {month}'] = self.previous_month.subtract(
-                months=(i + 1) - self.previous_month.month)
-            self.date_phrases[month] = self.this_month.add(
-                months=(i + 1) - self.this_month.month)
-            self.date_phrases[f'this {month}'] = self.this_month.add(
-                months=(i + 1) - self.this_month.month)
+            self.date_phrases[f"next {month}"] = self.next_month.add(months=(i + 1) - self.next_month.month)
+            self.date_phrases[f"previous {month}"] = self.previous_month.subtract(
+                months=(i + 1) - self.previous_month.month
+            )
+            self.date_phrases[month] = self.this_month.add(months=(i + 1) - self.this_month.month)
+            self.date_phrases[f"this {month}"] = self.this_month.add(months=(i + 1) - self.this_month.month)
 
-            for month_phrase in (f'next {month}', f'previous {month}',
-                                 month, f'this {month}'):
+            for month_phrase in (f"next {month}", f"previous {month}", month, f"this {month}"):
                 self.period_phrases[month_phrase] = pendulum.period(
-                    self.date_phrases[month_phrase],
-                    self.date_phrases[month_phrase].end_of('month'))
+                    self.date_phrases[month_phrase], self.date_phrases[month_phrase].end_of("month")
+                )
 
     def __call__(self, string, refresh=True):
         _unmodified_string = string
@@ -264,12 +257,11 @@ class DateParser:
             start, end = min(dt_1, dt_2), max(dt_1, dt_2)
             return pendulum.period(start, end)
 
-        raise ValueError(f'Cannot parse string: {string} '
-                         f'(original: {_unmodified_string})')
+        raise ValueError(f"Cannot parse string: {string} (original: {_unmodified_string})")
 
     def _handle_singlet(self, dt):
         if self.always_return_period:
-            return pendulum.period(dt, dt.end_of('day'))
+            return pendulum.period(dt, dt.end_of("day"))
         else:
             return dt
 
@@ -278,16 +270,14 @@ class DateParser:
         return self.convert_normalized_date(string, refresh)
 
     def split_datetime_string(self, string):
-        split_date = sorted((string.split(x) for x in self.splitters),
-                            key=lambda split: len(split), reverse=True)[0]
-        return split_date
+        return sorted((string.split(x) for x in self.splitters), key=lambda split: len(split), reverse=True)[0]
 
     def normalize_date(self, string):
         for f in self.pre_word_replace_date_transformations:
             string = f(string)
 
         for space_string in self.space_strings:
-            string = string.replace(space_string, ' ')
+            string = string.replace(space_string, " ")
 
         for word, replacement in self.replaced_words.items():
             string = string.replace(word, replacement)
@@ -317,13 +307,13 @@ class DateParser:
 
                 # Try to get behavior closer to the datetime module
                 if self.strict:
-                    no_brackets = date_format.replace('[', '').replace(']', '')
+                    no_brackets = date_format.replace("[", "").replace("]", "")
                     if len(no_brackets) != len(string):
                         continue
 
                 # Bug fix: "Jan 1 18" being parsed as 01 01 0018
                 if not self.strict and dt.year < 100:
-                    has_full_year = any(len(x) == 4 and x.isnumeric() for x in string.split(' '))
+                    has_full_year = any(len(x) == 4 and x.isnumeric() for x in string.split(" "))
                     if not has_full_year:
                         dt = dt.add(years=2000)
                 return dt
