@@ -1,6 +1,8 @@
 # Changelog
 
 ## in progress
+
+## 2025-02-24 v0.2.0
 - Maintenance: Add support for macOS, Windows, and Python 3.12 & 3.13
 - dudp-parser: Added new "dudp" parser, using `python-dateutil` and `dateparser`
 - Naming things: Use `TimeIntervalParser`, and return `TimeInterval` objects
