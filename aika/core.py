@@ -149,7 +149,7 @@ class TimeIntervalParser:
         interval = None
         if (when.isnumeric() and len(when) == 4) or "year" in when:
             interval = YEARLY
-        elif "M" in when or (when.count("-") == 1):
+        elif "M" in when or (len(when) == 7 and when.count("-") == 1):
             when = when.replace("M", "-")
             interval = MONTHLY
         elif "W" in when:

@@ -159,3 +159,54 @@ def test_year_next(ti):
         dt.datetime(2024, 1, 1, 0, 0),
         dt.datetime(2024, 12, 31, 23, 59, 59, 999999),
     )
+
+
+@freeze_time(TESTDRIVE_DATETIME)
+def test_delta(ti):
+    """
+    Test time interval deltas lika `-1d`.
+    """
+    assert ti.parse("-3d3h5m30s") == TimeInterval(
+        dt.datetime(2023, 8, 14, 19, 57, 47),
+        dt.datetime(2023, 8, 17, 23, 59, 59, 999999),
+    )
+
+    assert ti.parse("-1w") == TimeInterval(
+        dt.datetime(2023, 8, 10, 23, 3, 17),
+        dt.datetime(2023, 8, 17, 23, 59, 59, 999999),
+    )
+
+    assert ti.parse("-1 week") == TimeInterval(
+        dt.datetime(2023, 8, 10, 23, 3, 17),
+        dt.datetime(2023, 9, 10, 23, 3, 17),
+    )
+
+    assert ti.parse("-1M") == TimeInterval(
+        dt.datetime(2023, 8, 1, 0, 0),
+        dt.datetime(2023, 9, 1, 0, 0),
+    )
+
+    assert ti.parse("-1 month") == TimeInterval(
+        dt.datetime(2023, 7, 17, 23, 3, 17),
+        dt.datetime(2023, 8, 17, 23, 59, 59, 999999),
+    )
+
+    assert ti.parse("-3 M") == TimeInterval(
+        dt.datetime(2023, 8, 3, 0, 0),
+        dt.datetime(2023, 9, 3, 0, 0),
+    )
+
+    assert ti.parse("-3 months") == TimeInterval(
+        dt.datetime(2023, 5, 17, 23, 3, 17),
+        dt.datetime(2023, 8, 17, 23, 59, 59, 999999),
+    )
+
+    assert ti.parse("-1y") == TimeInterval(
+        dt.datetime(2022, 8, 17, 23, 3, 17),
+        dt.datetime(2023, 8, 17, 23, 59, 59, 999999),
+    )
+
+    assert ti.parse("-1 year") == TimeInterval(
+        dt.datetime(2022, 8, 17, 23, 3, 17),
+        dt.datetime(2023, 8, 17, 23, 3, 17),
+    )
