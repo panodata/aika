@@ -1,6 +1,8 @@
 # Changelog
 
 ## in progress
+
+## 2025-02-24 v0.2.1
 - Emit better error message when German locales are not installed
 
 ## 2025-02-24 v0.2.0
