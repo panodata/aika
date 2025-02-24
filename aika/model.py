@@ -24,7 +24,7 @@ class TimeInterval:
     """
 
     start: dt.datetime
-    end: t.Optional[dt.datetime]
+    end: t.Optional[dt.datetime] = None
 
     def githubformat(self) -> str:
         """
