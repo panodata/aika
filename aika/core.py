@@ -43,17 +43,22 @@ class TimeIntervalParser:
       Examples: next week, tomorrow to next thursday.
     """
 
+    NOW = ["now", "jetzt"]
+    TODAY = ["today", "heute"]
+
     def __init__(
         self,
         default_start_time: t.Optional[dt.time] = None,
         default_end_time: t.Optional[dt.time] = None,
         midnight_heuristics: bool = False,
+        snap_days: bool = False,
         return_tuple: bool = False,
     ):
         self.default_start_time = default_start_time
         self.default_end_time = default_end_time
         self.return_tuple = return_tuple
         self.midnight_heuristics = midnight_heuristics
+        self.snap_days = snap_days
         self.parsers: t.List[Parser] = []
         self.use_all_parsers()
 
@@ -63,7 +68,7 @@ class TimeIntervalParser:
             Parser(name="DateRangeParser [de]", fun=drp_parse_german),
             Parser(name="arbitrary-dateparser [de]", fun=adp_parse_german),
             Parser(name="arbitrary-dateparser [en]", fun=adp_parse_english),
-            Parser(name="DUDP [all]", fun=dudp_parse),
+            Parser(name="DUDP [all]", fun=self.dudp_parse),
         ]
 
     def clear_parsers(self):
@@ -92,6 +97,14 @@ class TimeIntervalParser:
         if date_start is None:
             raise ValueError(f"Failed detecting start date: {when}")
 
+        # A specific datetime must not be changed through `default_start_time`.
+        is_now = when in self.NOW
+        if self.snap_days and not is_now:
+            if self.default_start_time is not None:
+                date_start = dt.datetime.combine(date_start, self.default_start_time)
+            if date_end is not None and self.default_end_time is not None:
+                date_end = dt.datetime.combine(date_end, self.default_end_time)
+
         if self.midnight_heuristics:
             if date_start.time() in midnights and self.default_start_time is not None:
                 date_start = dt.datetime.combine(date_start, self.default_start_time)
@@ -119,6 +132,53 @@ class TimeIntervalParser:
             return ti[0]
         else:
             raise TypeError(f"Invalid time interval type: {type(ti)}")
+
+    def dudp_parse(self, when: str) -> trange:
+        """
+        Parse date range using `python-dateutil` and `dateparser` libraries.
+        """
+
+        if ".." in when:
+            return t.cast(trange, when.split(".."))
+
+        if "Q" in when:
+            year, quarter = when.split("Q")
+            q = fiscalyear.FiscalQuarter(int(year), int(quarter)).next_fiscal_quarter
+            return q.start, q.end
+
+        interval = None
+        if "M" in when or (when.count("-") == 1):
+            when = when.replace("M", "-")
+            interval = MONTHLY
+        elif "W" in when:
+            interval = WEEKLY
+
+        t_start: t.Optional[dt.datetime] = None
+        try:
+            if "-" in when or "W" in when:
+                t_start = dateutil.parser.isoparse(when)
+            else:
+                t_start = dateutil.parser.parse(when)
+        except dateutil.parser.ParserError:
+            parser = dateparser.date.DateDataParser()
+            response = parser.get_date_data(when)
+            t_start = response.date_obj
+            if self.snap_days:
+                if when in self.TODAY and t_start is not None:
+                    t_start = t_start.replace(hour=0, minute=0, second=0, microsecond=0)
+
+        if t_start is None:
+            raise ValueError(f"Failed parsing date range: {when}")
+
+        t_end: t.Optional[dt.datetime] = None
+        if interval == MONTHLY:
+            t_end = t_start + dt.timedelta(days=31)
+        elif interval == WEEKLY:
+            t_end = t_start + dt.timedelta(weeks=1)
+        else:
+            t_end = dt.datetime.today().replace(hour=23, minute=59, second=59, microsecond=999999)
+
+        return t_start, t_end
 
 
 def adp_parse_english(when: str) -> trange:
@@ -155,47 +215,9 @@ def from_pendulum(period: "pandulum.Period") -> trange:
     return pendulum_to_datetime(date_start), pendulum_to_datetime(date_end)
 
 
-def dudp_parse(when: str) -> trange:
-    """
-    Parse date range using `python-dateutil` and `dateparser` libraries.
-    """
-
-    if ".." in when:
-        return t.cast(trange, when.split(".."))
-
-    if "Q" in when:
-        year, quarter = when.split("Q")
-        q = fiscalyear.FiscalQuarter(int(year), int(quarter)).next_fiscal_quarter
-        return q.start, q.end
-
-    interval = None
-    if "M" in when or (when.count("-") == 1):
-        when = when.replace("M", "-")
-        interval = MONTHLY
-    elif "W" in when:
-        interval = WEEKLY
-
-    t_start: t.Optional[dt.datetime] = None
-    try:
-        if "-" in when or "W" in when:
-            t_start = dateutil.parser.isoparse(when)
-        else:
-            t_start = dateutil.parser.parse(when)
-    except dateutil.parser.ParserError:
-        t_start = dateparser.parse(when)
-
-    if t_start is None:
-        raise ValueError(f"Failed parsing date range: {when}")
-
-    if interval == MONTHLY:
-        t_end = t_start + dt.timedelta(days=31)
-    elif interval == WEEKLY:
-        t_end = t_start + dt.timedelta(weeks=1)
-    else:
-        t_end = dt.datetime.today().replace(hour=23, minute=59, second=59, microsecond=999999)
-
-    return t_start, t_end
-
-
 class DaterangeExpression(TimeIntervalParser):
-    pass
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault("snap_days", True)
+        kwargs.setdefault("midnight_heuristics", True)
+        kwargs.setdefault("return_tuple", True)
+        super().__init__(*args, **kwargs)
