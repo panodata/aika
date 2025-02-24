@@ -7,20 +7,22 @@ https://pypi.org/project/arbitrary-dateparser/
 import calendar
 import re
 from itertools import product
-from typing import Tuple
+from typing import List
 
 import pendulum
-from arbitrary_dateparser import DateParser
+from pendulum import WeekDay
 
 from aika.util import LocaleManager
+
+from .arbitrary_dateparser import DateParser
 
 with LocaleManager("de_DE.UTF-8"):
     MONTH_NAMES = [calendar.month_name[x].lower() for x in range(1, 13)]
     MONTH_NAMES_ABBREVIATED = [calendar.month_abbr[x].lower() for x in range(1, 13)]
 
     # Start with Sunday for Indexing.
-    DAY_NAMES = [calendar.day_name[x].lower() for x in (6, *range(0, 6))]
-    DAY_NAMES_ABBREVIATED = [calendar.day_abbr[x].lower() for x in (6, *range(0, 6))]
+    DAY_NAMES = [calendar.day_name[x].lower() for x in range(7)]
+    DAY_NAMES_ABBREVIATED = [calendar.day_abbr[x].lower() for x in range(7)]
 
 # German language has masculine, feminine, and neuter forms for entities of calendar nouns.
 # https://deutsch.lingolia.com/en/grammar/nouns-and-articles/gender
@@ -107,7 +109,7 @@ class DateParserGerman(DateParser):
             self.replaced_words[month] = MONTH_NAMES_ABBREVIATED[i]
 
         # These variables modify dates
-        self.unfiltered_words: Tuple[str]
+        self.unfiltered_words: List[str]
         self.post_word_replace_date_transformations = [
             lambda s: " ".join(x for x in s.split(" ") if x in self.unfiltered_words or not x.isalpha()),
         ]
@@ -232,17 +234,17 @@ class DateParserGerman(DateParser):
 
         # Strings with direct period translations
         self.period_phrases = {
-            f"{THIS_MN} monat": pendulum.period(self.this_month, self.this_month.end_of("month")),
-            f"{THIS_MG} monat": pendulum.period(self.this_month, self.this_month.end_of("month")),
-            f"{NEXT_MN} monat": pendulum.period(self.next_month, self.next_month.end_of("month")),
-            f"{NEXT_MG} monat": pendulum.period(self.next_month, self.next_month.end_of("month")),
-            f"{PREVIOUS_MN} monat": pendulum.period(self.previous_month, self.previous_month.end_of("month")),
-            f"{PREVIOUS_MG} monat": pendulum.period(self.previous_month, self.previous_month.end_of("month")),
-            f"{THIS_F} woche": pendulum.period(self.this_week, self.this_week.end_of("week")),
-            f"{NEXT_F} woche": pendulum.period(self.next_week, self.next_week.end_of("week")),
-            f"{PREVIOUS_F} woche": pendulum.period(self.previous_week, self.previous_week.end_of("week")),
-            f"{THIS_N} jahr": pendulum.period(self.this_year, self.this_year.end_of("year")),
-            f"{PREVIOUS_N} jahr": pendulum.period(self.next_year, self.next_year.end_of("year")),
+            f"{THIS_MN} monat": pendulum.Interval(self.this_month, self.this_month.end_of("month")),
+            f"{THIS_MG} monat": pendulum.Interval(self.this_month, self.this_month.end_of("month")),
+            f"{NEXT_MN} monat": pendulum.Interval(self.next_month, self.next_month.end_of("month")),
+            f"{NEXT_MG} monat": pendulum.Interval(self.next_month, self.next_month.end_of("month")),
+            f"{PREVIOUS_MN} monat": pendulum.Interval(self.previous_month, self.previous_month.end_of("month")),
+            f"{PREVIOUS_MG} monat": pendulum.Interval(self.previous_month, self.previous_month.end_of("month")),
+            f"{THIS_F} woche": pendulum.Interval(self.this_week, self.this_week.end_of("week")),
+            f"{NEXT_F} woche": pendulum.Interval(self.next_week, self.next_week.end_of("week")),
+            f"{PREVIOUS_F} woche": pendulum.Interval(self.previous_week, self.previous_week.end_of("week")),
+            f"{THIS_N} jahr": pendulum.Interval(self.this_year, self.this_year.end_of("year")),
+            f"{PREVIOUS_N} jahr": pendulum.Interval(self.next_year, self.next_year.end_of("year")),
         }
 
         def set_phrase(*prefixes, key, value):
@@ -251,15 +253,15 @@ class DateParserGerman(DateParser):
                 self.date_phrases[key_effective] = value
 
         for i, day in enumerate(DAY_NAMES_ABBREVIATED):
-            set_phrase(NEXT_MN, NEXT_MG, key=day, value=self.today.next(i))
-            set_phrase(PREVIOUS_MN, PREVIOUS_MG, key=day, value=self.today.previous(i))
+            set_phrase(NEXT_MN, NEXT_MG, key=day, value=self.today.next(WeekDay(i)))
+            set_phrase(PREVIOUS_MN, PREVIOUS_MG, key=day, value=self.today.previous(WeekDay(i)))
 
             if self.today.day_of_week == i:
                 self.date_phrases[day] = self.today
                 set_phrase(THIS_MN, THIS_MG, key=day, value=self.today)
             else:
-                self.date_phrases[day] = self.today.next(i)
-                set_phrase(THIS_MN, THIS_MG, key=day, value=self.today.next(i))
+                self.date_phrases[day] = self.today.next(WeekDay(i))
+                set_phrase(THIS_MN, THIS_MG, key=day, value=self.today.next(WeekDay(i)))
 
         for i, month in enumerate(MONTH_NAMES_ABBREVIATED):
             set_phrase(NEXT_MN, NEXT_MG, key=month, value=self.next_month.add(months=(i + 1) - self.next_month.month))
@@ -282,6 +284,6 @@ class DateParserGerman(DateParser):
                 f"{THIS_MG} {month}",
             ]
             for month_phrase in month_phrases:
-                self.period_phrases[month_phrase] = pendulum.period(
+                self.period_phrases[month_phrase] = pendulum.Interval(
                     self.date_phrases[month_phrase], self.date_phrases[month_phrase].end_of("month")
                 )

@@ -4,7 +4,6 @@
 import datetime as dt
 import sys
 
-import pytest
 from freezegun import freeze_time
 
 from aika import TimeIntervalParser
@@ -51,8 +50,6 @@ def test_single_relative_today(dr):
     )
 
 
-# TODO: How to make it work using the `dateparser` package?
-@pytest.mark.skipif(sys.version_info >= (3, 12), reason="arbitrary-dateparser only available for Python <= 3.11")
 @freeze_time(TESTDRIVE_DATETIME)
 def test_single_relative_friday(dr):
     assert (
@@ -84,8 +81,6 @@ def test_single_absolute(dr):
     )
 
 
-# TODO: How to make it work using the `dateparser` package?
-@pytest.mark.skipif(sys.version_info >= (3, 12), reason="arbitrary-dateparser only available for Python <= 3.11")
 @freeze_time(TESTDRIVE_DATETIME)
 def test_range_basics(dr):
     # Make the parser exclusively use `arbitrary-dateparser`,
@@ -107,8 +102,6 @@ def test_range_basics(dr):
     )
 
 
-# TODO: How to make it work using the `dateparser` package?
-@pytest.mark.skipif(sys.version_info >= (3, 12), reason="arbitrary-dateparser only available for Python <= 3.11")
 @freeze_time(TESTDRIVE_DATETIME)
 def test_range_relative(dr):
     assert (
@@ -175,12 +168,10 @@ def test_default_start_end_time():
         )
 
 
-# TODO: How to make it work using the `dateparser` package?
-@pytest.mark.skipif(sys.version_info >= (3, 12), reason="arbitrary-dateparser only available for Python <= 3.11")
 @freeze_time(TESTDRIVE_DATETIME)
 def test_range_relative_weekdays():
     dr = TimeIntervalParser(
-        midnight_heuristics=True,
+        snap_days=True,
         default_start_time=dt.time(hour=9),
         default_end_time=dt.time(hour=17),
         return_tuple=True,
@@ -198,8 +189,6 @@ def test_range_relative_weekdays():
     )
 
 
-# TODO: How to make it work using the `dateparser` package?
-@pytest.mark.skipif(sys.version_info >= (3, 12), reason="arbitrary-dateparser only available for Python <= 3.11")
 @freeze_time(TESTDRIVE_DATETIME)
 def test_months():
     dr = TimeIntervalParser(

@@ -4,17 +4,17 @@ Contains the DateParser module and relevant constants.
 
 import calendar
 import re
-import typing as t
 from itertools import product
 
 import pendulum
+from pendulum import WeekDay
 
 MONTH_NAMES = [calendar.month_name[x].lower() for x in range(1, 13)]
 MONTH_NAMES_ABBREVIATED = [calendar.month_abbr[x].lower() for x in range(1, 13)]
 
 # Start with Sunday for Indexing.
-DAY_NAMES = [calendar.day_name[x].lower() for x in (6, *range(0, 6))]
-DAY_NAMES_ABBREVIATED = [calendar.day_abbr[x].lower() for x in (6, *range(0, 6))]
+DAY_NAMES = [calendar.day_name[x].lower() for x in range(7)]
+DAY_NAMES_ABBREVIATED = [calendar.day_abbr[x].lower() for x in range(7)]
 
 
 class DateParser:
@@ -24,11 +24,9 @@ class DateParser:
         support_periods=True,
         always_return_period=True,
         format_templates=None,
-        unfiltered_words: t.Optional[t.List[str]] = None,
+        unfiltered_words=None,
         strict=True,
     ):
-        unfiltered_words = unfiltered_words or []
-
         # What timezone to use?
         self.tz = tz
 
@@ -67,7 +65,7 @@ class DateParser:
 
         # These variables modify dates
         self.post_word_replace_date_transformations = [
-            lambda s: " ".join(x for x in s.split(" ") if x in unfiltered_words or not x.isalpha()),
+            lambda s: " ".join(x for x in s.split(" ") if x in self.unfiltered_words or not x.isalpha()),  # type: ignore[has-type]
         ]
 
         self.regex_replacements = {
@@ -105,10 +103,14 @@ class DateParser:
                 # | {'%s [At] {t}' % x for x in format_templates}
             )
 
-        self.date_formats = [
-            f.format(d=d, m=m, y=y, t=t)
-            for d, m, y, t, f in product(_day_formats, _month_formats, _year_formats, _time_formats, format_templates)
-        ]
+        self.date_formats = list(
+            {
+                f.format(d=d, m=m, y=y, t=t)
+                for d, m, y, t, f in product(
+                    _day_formats, _month_formats, _year_formats, _time_formats, format_templates
+                )
+            }
+        )
 
         # Unfortunately this appears to be necessary for consistent behavior
         def _format_sorter(fmt):
@@ -182,26 +184,26 @@ class DateParser:
 
         # Strings with direct period translations
         self.period_phrases = {
-            "this month": pendulum.period(self.this_month, self.this_month.end_of("month")),
-            "next month": pendulum.period(self.next_month, self.next_month.end_of("month")),
-            "previous month": pendulum.period(self.previous_month, self.previous_month.end_of("month")),
-            "this week": pendulum.period(self.this_week, self.this_week.end_of("week")),
-            "next week": pendulum.period(self.next_week, self.next_week.end_of("week")),
-            "previous week": pendulum.period(self.previous_week, self.previous_week.end_of("week")),
-            "this year": pendulum.period(self.this_year, self.this_year.end_of("year")),
-            "previous year": pendulum.period(self.next_year, self.next_year.end_of("year")),
+            "this month": pendulum.Interval(self.this_month, self.this_month.end_of("month")),
+            "next month": pendulum.Interval(self.next_month, self.next_month.end_of("month")),
+            "previous month": pendulum.Interval(self.previous_month, self.previous_month.end_of("month")),
+            "this week": pendulum.Interval(self.this_week, self.this_week.end_of("week")),
+            "next week": pendulum.Interval(self.next_week, self.next_week.end_of("week")),
+            "previous week": pendulum.Interval(self.previous_week, self.previous_week.end_of("week")),
+            "this year": pendulum.Interval(self.this_year, self.this_year.end_of("year")),
+            "previous year": pendulum.Interval(self.next_year, self.next_year.end_of("year")),
         }
 
         for i, day in enumerate(DAY_NAMES_ABBREVIATED):
-            self.date_phrases[f"next {day}"] = self.today.next(i)
-            self.date_phrases[f"previous {day}"] = self.today.previous(i)
+            self.date_phrases[f"next {day}"] = self.today.next(WeekDay(i))
+            self.date_phrases[f"previous {day}"] = self.today.previous(WeekDay(i))
 
             if self.today.day_of_week == i:
                 self.date_phrases[day] = self.today
                 self.date_phrases[f"this {day}"] = self.today
             else:
-                self.date_phrases[day] = self.today.next(i)
-                self.date_phrases[f"this {day}"] = self.today.next(i)
+                self.date_phrases[day] = self.today.next(WeekDay(i))
+                self.date_phrases[f"this {day}"] = self.today.next(WeekDay(i))
 
         for i, month in enumerate(MONTH_NAMES_ABBREVIATED):
             self.date_phrases[f"next {month}"] = self.next_month.add(months=(i + 1) - self.next_month.month)
@@ -212,7 +214,7 @@ class DateParser:
             self.date_phrases[f"this {month}"] = self.this_month.add(months=(i + 1) - self.this_month.month)
 
             for month_phrase in (f"next {month}", f"previous {month}", month, f"this {month}"):
-                self.period_phrases[month_phrase] = pendulum.period(
+                self.period_phrases[month_phrase] = pendulum.Interval(
                     self.date_phrases[month_phrase], self.date_phrases[month_phrase].end_of("month")
                 )
 
@@ -255,13 +257,13 @@ class DateParser:
                 dt_2 = self.convert_normalized_date(str_2, False)
 
             start, end = min(dt_1, dt_2), max(dt_1, dt_2)
-            return pendulum.period(start, end)
+            return pendulum.Interval(start, end)
 
         raise ValueError(f"Cannot parse string: {string} (original: {_unmodified_string})")
 
     def _handle_singlet(self, dt):
         if self.always_return_period:
-            return pendulum.period(dt, dt.end_of("day"))
+            return pendulum.Interval(dt, dt.end_of("day"))
         else:
             return dt
 
