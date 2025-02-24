@@ -26,6 +26,19 @@ class TimeInterval:
     start: dt.datetime
     end: t.Optional[dt.datetime]
 
+    def githubformat(self) -> str:
+        """
+        Mathematical interval format, short notation as used by GitHub: `n..n`.
+        Example: `updated:2025-02-17..2025-02-24`
+
+        https://docs.github.com/en/search-github/getting-started-with-searching-on-github/understanding-the-search-syntax#query-for-values-between-a-range
+        """
+        github_datetime_format = "%Y-%m-%d"
+        buffer = f"{self.start.strftime(github_datetime_format)}"
+        if self.end:
+            buffer += f"..{self.end.strftime(github_datetime_format)}"
+        return buffer
+
     def isoformat(self) -> str:
         """
         Encode as ISO 8601 time interval.
@@ -46,7 +59,7 @@ class TimeInterval:
 
     def mathformat(self) -> str:
         """
-        Mathematical interval format, as also used by GitHub: `n..n`.
+        Mathematical interval format: `n..n`.
 
         A integer interval: [𝑎..𝑏] represents all integers in between 𝑎 and 𝑏.
 
@@ -54,7 +67,6 @@ class TimeInterval:
         where the first number N is the lowest value and the second is the highest value.
 
         https://math.stackexchange.com/a/2056522
-        https://docs.github.com/en/search-github/getting-started-with-searching-on-github/understanding-the-search-syntax#query-for-values-between-a-range
         """
         buffer = f"{self.start.isoformat()}"
         if self.end:
