@@ -30,3 +30,4 @@
   https://github.com/panodata/aika/issues/46
 - Use portion?
   https://github.com/AlexandreDecan/portion
+- https://github.com/alvinwan/timefhuman
