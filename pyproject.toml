@@ -83,7 +83,7 @@ optional-dependencies.release = [
 ]
 optional-dependencies.test = [
   "freezegun<1.6",
-  "pytest<9",
+  "pytest<10",
   "pytest-cov<8",
 ]
 urls.Changelog = "https://github.com/panodata/aika/blob/main/CHANGES.md"
