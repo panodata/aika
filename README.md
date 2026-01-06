@@ -1,8 +1,20 @@
 # Aika
 
-Time interval parsing utilities for multiple languages.
+[![Status][badge-status]][project-pypi]
+[![CI][badge-ci]][project-ci]
+[![Coverage][badge-coverage]][project-coverage]
+[![Downloads per month][badge-downloads-per-month]][project-downloads]
+
+[![License][badge-license]][project-license]
+[![Release Notes][badge-release-notes]][project-release-notes]
+[![PyPI Version][badge-package-version]][project-pypi]
+[![Python Versions][badge-python-versions]][project-pypi]
 
 ## About
+
+Time interval parsing utilities for multiple languages.
+
+## Details
 
 Aika provides date- and time-range parsing utilities for multiple languages.
 It is based on [dateparser], [arbitrary-dateparser], and [DateRangeParser],
@@ -191,3 +203,18 @@ Aika means "time" in the Finnish language.
 [Elias Dorneles]: https://github.com/eliasdorneles
 [Michael Phelps]: https://github.com/nottheswimmer
 [Robin Wilson]: https://github.com/robintw
+
+[badge-ci]: https://github.com/panodata/aika/actions/workflows/main.yml/badge.svg
+[badge-coverage]: https://codecov.io/gh/panodata/aika/branch/main/graph/badge.svg
+[badge-downloads-per-month]: https://pepy.tech/badge/aika/month
+[badge-license]: https://img.shields.io/github/license/panodata/aika
+[badge-package-version]: https://img.shields.io/pypi/v/aika.svg
+[badge-python-versions]: https://img.shields.io/pypi/pyversions/aika.svg
+[badge-release-notes]: https://img.shields.io/github/release/panodata/aika?label=Release+Notes
+[badge-status]: https://img.shields.io/pypi/status/aika.svg
+[project-ci]: https://github.com/panodata/aika/actions/workflows/main.yml
+[project-coverage]: https://app.codecov.io/gh/panodata/aika
+[project-downloads]: https://pepy.tech/project/aika/
+[project-license]: https://github.com/panodata/aika/blob/main/LICENSE
+[project-pypi]: https://pypi.org/project/aika
+[project-release-notes]: https://github.com/panodata/aika/releases
