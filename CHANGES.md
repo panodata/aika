@@ -1,6 +1,7 @@
 # Changelog
 
 ## in progress
+- Validated support on Python 3.14
 
 ## 2025-02-24 v0.3.0
 - Naming things: Renamed argument `snap_days` to `snap_hours`
