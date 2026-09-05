@@ -85,6 +85,13 @@ jobs:
         uv pip install poetry
         uv pip install --editable='.[develop,test]'
 
+    - name: Set timezone
+      uses: szenius/set-timezone@v2.0
+      with:
+        timezoneLinux: "Europe/Berlin"
+        timezoneMacos: "Europe/Berlin"
+        timezoneWindows: "European Standard Time"
+
     - name: Run linter and software tests
       run: |
         poe check
