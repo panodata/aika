@@ -22,77 +22,57 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [
-          "ubuntu-latest",
-          "macos-15",
-          "macos-15-intel",
-          # "macos-26-intel",  # FIXME: ValueError: Failed detecting start date
-          # "macos-latest",    # FIXME: ValueError: Failed detecting start date
-          "windows-latest",
-        ]
-        python-version: [
-          "3.8",
-          "3.9",
-          "3.10",
-          "3.11",
-          "3.12",
-          "3.13",
-          "3.14",
-        ]
+        os:
+          - "ubuntu-latest"
+          - "macos-15"
+          - "macos-15-intel"
+          #- "macos-26-intel"  # FIXME: ValueError: Failed detecting start date
+          #- "macos-latest"    # FIXME: ValueError: Failed detecting start date
+          - "windows-latest"
+        python-version:
+          - "3.8"
+          - "3.9"
+          - "3.10"
+          - "3.11"
+          - "3.12"
+          - "3.13"
+          - "3.14"
 
     env:
       OS: ${{ matrix.os }}
       PYTHON: ${{ matrix.python-version }}
       TZ: Europe/Berlin
-      UV_SYSTEM_PYTHON: true
 
     name: Python ${{ matrix.python-version }} on OS ${{ matrix.os }}
     steps:
-
-    - name: Acquire sources
-      uses: actions/checkout@v7
 
     - name: Install German locales
       if: runner.os == 'Linux'
       run: |
         sudo apt-get update && sudo apt-get install tzdata locales -y && sudo locale-gen de_DE.UTF-8
 
-    - name: Set up Python
-      uses: actions/setup-python@v7
-      with:
-        python-version: ${{ matrix.python-version }}
-
-    - name: Set up uv
-      uses: astral-sh/setup-uv@v7
-      with:
-        cache-dependency-glob: |
-          pyproject.toml
-        cache-suffix: ${{ matrix.python-version }}
-        enable-cache: true
-        version: "latest"
-
-    - name: Setup project
-      run: |
-
-        # `setuptools 0.64.0` adds support for editable install hooks (PEP 660).
-        # https://github.com/pypa/setuptools/blob/main/CHANGES.rst#v6400
-        uv pip install "setuptools>=64" --upgrade
-
-        # Install `wheel` package.
-        uv pip install wheel
-
-        # Install package in editable mode.
-        # FIXME: Workaround for installing pendulum 2.x on Python 3.12.
-        # https://github.com/sdispater/pendulum/issues/454#issuecomment-654096754
-        uv pip install poetry
-        uv pip install --editable='.[develop,test]'
-
-    - name: Set timezone
+    - name: Configure timezone
       uses: szenius/set-timezone@v2.0
       with:
         timezoneLinux: "Europe/Berlin"
         timezoneMacos: "Europe/Berlin"
         timezoneWindows: "European Standard Time"
+
+    - name: Acquire sources
+      uses: actions/checkout@v7
+
+    - name: Install uv
+      uses: astral-sh/setup-uv@v7
+      with:
+        activate-environment: 'true'
+        cache-suffix: ${{ matrix.python-version }}
+        enable-cache: 'true'
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install project
+      run: |
+        uv pip install pip
+        uv pip install --editable='.[develop,test]'
 
     - name: Run linter and software tests
       run: |
@@ -103,8 +83,5 @@ jobs:
       env:
         CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
       with:
-        files: ./coverage.xml
-        flags: unittests
         env_vars: OS,PYTHON
-        name: codecov-umbrella
         fail_ci_if_error: true
