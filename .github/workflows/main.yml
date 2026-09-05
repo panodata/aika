@@ -24,9 +24,10 @@ jobs:
       matrix:
         os: [
           "ubuntu-latest",
+          "macos-15",
           "macos-15-intel",
-          "macos-26-intel",
-          # "macos-latest",  # FIXME: ValueError: Failed detecting start date
+          # "macos-26-intel",  # FIXME: ValueError: Failed detecting start date
+          # "macos-latest",    # FIXME: ValueError: Failed detecting start date
           "windows-latest",
         ]
         python-version: [
