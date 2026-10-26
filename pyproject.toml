@@ -69,7 +69,7 @@ dependencies = [
   "daterangeparser<1.4",
   "fiscalyear<0.5",
   "pendulum<4",
-  "python-dateutil<3",
+  "python-dateutil<4",
 ]
 
 optional-dependencies.develop = [
