@@ -65,7 +65,7 @@ dynamic = [
 ]
 
 dependencies = [
-  "dateparser<1.5",
+  "dateparser<1.6",
   "daterangeparser<1.4",
   "fiscalyear<0.5",
   "pendulum<4",
